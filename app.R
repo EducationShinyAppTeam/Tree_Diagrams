@@ -21,14 +21,9 @@ APP_DESCP <<- paste(
 nodeNames <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M")
 
 # Set up question banks for challenge levels
-bank1 <- read.csv("Context_Bank_L1.csv", header = TRUE) # Read in question bank
-#bank1 <- filter(bank1, nchar(Context)>0)
-
-bank2 <- read.csv("Context_Bank_L2.csv", header = TRUE) # Read in question bank
-#bank2 <- filter(bank2, nchar(Context)>0)
-
-bank3 <- read.csv("Context_Bank_L3.csv", header = TRUE) # Read in question bank
-#bank3 <- filter(bank3, nchar(Context)>0)
+bank1 <- read.csv("Context_Bank_L1.csv", header = TRUE) # Read in question bank 1
+bank2 <- read.csv("Context_Bank_L2.csv", header = TRUE) # Read in question bank 2
+bank3 <- read.csv("Context_Bank_L3.csv", header = TRUE) # Read in question bank 3
 
 # Tracks context number, question number, and when to reset the show answer options 
 index <- reactiveValues(context1=1, question1=1, 
@@ -1542,9 +1537,11 @@ p <- function(context, probabilities2, probabilities3, bank){
   
   # Convert matrix probs to list of weights
   w <- function(probs, numeric=T){
+    # First 2 ifs catch temporary errors when switching between contexts
+    if(!is.null(probs)){
+      if(nrow(probs)>=3){
     # Weights that always exist
     weight <- c(probs[1, ], probs[2, ], probs[3, ])
-    if(!is.null(probs)){
     # Case for at least one node having 3 children
     if(ncol(probs)==3){
       # Check case for number of rows
@@ -1557,7 +1554,11 @@ p <- function(context, probabilities2, probabilities3, bank){
           weight <- c(weight, rep(0, 3))
         round(weight, 2)}
         else{weight <- c(weight, rep("", 3)) }
-      }}}
+      }}
+      }
+      else{
+        weight <- rep(0,12)
+      }}
     else{
       weight <- rep(0, 6)
     }
