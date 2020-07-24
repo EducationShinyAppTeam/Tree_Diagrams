@@ -22,13 +22,13 @@ nodeNames <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M")
 
 # Set up question banks for challenge levels
 bank1 <- read.csv("Context_Bank_L1.csv", header = TRUE) # Read in question bank
-bank1 <- filter(bank1, nchar(Context)>0)
+#bank1 <- filter(bank1, nchar(Context)>0)
 
 bank2 <- read.csv("Context_Bank_L2.csv", header = TRUE) # Read in question bank
-bank2 <- filter(bank2, nchar(Context)>0)
+#bank2 <- filter(bank2, nchar(Context)>0)
 
 bank3 <- read.csv("Context_Bank_L3.csv", header = TRUE) # Read in question bank
-bank3 <- filter(bank3, nchar(Context)>0)
+#bank3 <- filter(bank3, nchar(Context)>0)
 
 # Tracks context number, question number, and when to reset the show answer options 
 index <- reactiveValues(context1=1, question1=1, 
