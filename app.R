@@ -25,14 +25,6 @@ bank1 <- read.csv("Context_Bank_L1.csv", header = TRUE) # Read in question bank 
 bank2 <- read.csv("Context_Bank_L2.csv", header = TRUE) # Read in question bank 2
 bank3 <- read.csv("Context_Bank_L3.csv", header = TRUE) # Read in question bank 3
 
-# Tracks context number, question number, and when to reset the show answer options 
-index <- reactiveValues(context1=1, question1=1, 
-                        context2=1, question2=1, 
-                        context3=1, question3=1)
-reset <- reactiveValues(weight=FALSE, question=FALSE, answer=FALSE, 
-                        setUp2=FALSE, setUpAns2=FALSE, hint3=FALSE, 
-                        ans1=FALSE, ans2 = FALSE, ans3=FALSE)
-
 # Define UI for App
 ui <- list(
   useShinyjs(), 
@@ -208,6 +200,17 @@ ui <- list(
             mainPanel(
               # Show Tree
               plotOutput("exploreGraph"), 
+              # tags$script(HTML(
+              #   "$(document).ready(function() {
+              #       document.getElementById('exploreGraph').setAttribute('aria-label',
+              #       `This plot shows the tree diagram for the scenario. The root
+              #       is node A, which has two branches, infected and not infected,
+              #       which lead to nodes B and C respectively. Each of these has a
+              #       branch for a positive and negative test with the resulting leaf
+              #       nodes as E and F for B and H and I for C.`)
+              #     })"
+              # )),
+               htmlOutput("exploreAlt"),
               # Outputted text for part 2
               conditionalPanel(condition = "input.next", 
                                textOutput("posTest"), # Probability of positive test
@@ -299,6 +302,13 @@ ui <- list(
                          
                          # Plot tree
                          plotOutput("graph1"), 
+                         tags$script(HTML(
+                           "$(document).ready(function() {
+                  document.getElementById('graph1').setAttribute('aria-label',
+                  `This plot shows the tree diagram that you created.`)
+                })"
+                         )),
+                         htmlOutput("graph1Alt"),
                          textOutput("question1"),
                          actionButton("newQuestion1", "Next Question"),
                          conditionalPanel(
@@ -442,7 +452,14 @@ ui <- list(
                        conditionalPanel(
                          condition = "!output.nextStep2", 
                          p("Current tree structure you have designed:"), 
-                         plotOutput("tempGraph2")
+                         plotOutput("tempGraph2"),
+                         tags$script(HTML(
+                           "$(document).ready(function() {
+                  document.getElementById('tempGraph2').setAttribute('aria-label',
+                  `This plot shows the structure of the tree diagram your 
+                  responses suggest.`)
+                })"
+                         )),
                          ), 
                        conditionalPanel(
                          condition = "output.nextStep2", 
@@ -452,7 +469,14 @@ ui <- list(
 
                        # Plot tree
                        plotOutput("graph2"), 
-                       
+                #        tags$script(HTML(
+                #          "$(document).ready(function() {
+                #   document.getElementById('graph2').setAttribute('aria-label',
+                #   `This plot shows the tree diagram that you created.`)
+                # })"
+                #        )),
+                       htmlOutput("graph2Alt"),       
+                
                        textOutput("question2"), 
                         actionButton("newQuestion2", "Next Question"), 
                               conditionalPanel(
@@ -604,6 +628,13 @@ ui <- list(
                   class="redtext")
             ), 
             plotOutput("graph3"), 
+            tags$script(HTML(
+              "$(document).ready(function() {
+                  document.getElementById('graph3').setAttribute('aria-label',
+                  `This plot shows the tree diagram that you created using 
+                  the inputs with node A as the root node.`)
+                })"
+            )),
             textOutput("question3"), 
             actionButton("newQuestion3", "Next Question"), 
                    conditionalPanel(
@@ -671,8 +702,8 @@ ui <- list(
           ), 
           p(
             class = "hangingindent", 
-            "Csardi, G. and Nepusz, T.: The igraph software package for complex 
-            network research, InterJournal, Complex Systems 1695. 2006. 
+            "Csardi, G. and Nepusz, T. (2006), igraph: The igraph software package for complex 
+            network research, InterJournal, Complex Systems 1695. 
             http://igraph.org"
           ), 
           p(
@@ -713,6 +744,14 @@ ui <- list(
 
 # Define server logic ----
 server <- function(input, output, session) {
+  # Tracks context number, question number, and when to reset the show answer options 
+  index <- reactiveValues(context1=1, question1=1, 
+                          context2=1, question2=1, 
+                          context3=1, question3=1)
+  reset <- reactiveValues(weight=FALSE, question=FALSE, answer=FALSE, 
+                          setUp2=FALSE, setUpAns2=FALSE, hint3=FALSE, 
+                          ans1=FALSE, ans2 = FALSE, ans3=FALSE)
+  
   # Info button
   observeEvent(input$info, {
     sendSweetAlert(
@@ -2884,6 +2923,9 @@ output$sampleAns3 <- renderPlot({
     }
   }
   # Decide which version of a hint to give
+  full <- df
+  full$label <- bank3[index$context3, 2:13][bank3[index$context3, 2:13] != "-"]
+  
   # If structure is wrong, just show the structure
   if(!structureCheck3()){ 
     graph <- graph(df = df, 
@@ -2892,6 +2934,19 @@ output$sampleAns3 <- renderPlot({
                    layout = layout_as_tree(graph_from_data_frame(df), root=1), 
                    showProbs = F, 
                    colors=colors)
+    output$sampleAns3Alt <- renderUI({
+      sentences <- "This plot shows the tree."
+      for(row in 1:nrow(full)){
+        sentences <- paste0(sentences, " Edge ", row, " goes from ", full$from[row], " to ", 
+                            full$to[row], " and is labeled ", full$label[row], ".")
+      }
+      tags$script(HTML(
+        paste0("$(document).ready(function() {
+                    document.getElementById('sampleAns3').setAttribute('aria-label', `",
+               sentences,"`)
+                  })"
+        )))
+    })
   }
   # If structure is right but probabilities off, show just up to probabilities
   else if(!correct(index$context3, bank3, probabilities3())){
@@ -2901,9 +2956,37 @@ output$sampleAns3 <- renderPlot({
                    layout = layout_as_tree(graph_from_data_frame(df), root=1), 
                    showProbs = T, 
                    colors=colors)
+    output$sampleAns3Alt <- renderUI({
+      sentences <- "This plot shows the tree."
+      for(row in 1:nrow(full)){
+        sentences <- paste0(sentences, " Edge ", row, " goes from ", full$from[row], " to ", 
+                            full$to[row], " and is labeled ", full$label[row], " with weight ",
+                            df$weight[row],".")
+      }
+      tags$script(HTML(
+        paste0("$(document).ready(function() {
+                    document.getElementById('sampleAns3').setAttribute('aria-label', `",
+               sentences,"`)
+                  })"
+        )))
+    })
   }
   # If probabilities are right too, include leaf node probabilities
   else{
+    output$sampleAns3Alt <- renderUI({
+      sentences <- "This plot shows the tree."
+      for(row in 1:nrow(full)){
+        sentences <- paste0(sentences, " Edge ", row, " goes from ", full$from[row], " to ", 
+                            full$to[row], " and is labeled ", full$label[row], " with weight ",
+                            df$weight[row],".")
+      }
+      tags$script(HTML(
+        paste0("$(document).ready(function() {
+                    document.getElementById('sampleAns3').setAttribute('aria-label', `",
+               sentences,"`)
+                  })"
+        )))
+    })
     weightIndex <- 1
     pasteAtEnd <- c()
     probs <- correctProbabilities3()[order(rownames(correctProbabilities3())), 1]
@@ -2929,6 +3012,8 @@ observeEvent(input$showHint3, {
                  title = "Hint: Does your tree look similar to the one below?", 
                  text = tags$div(
                    plotOutput("sampleAns3"), 
+                   htmlOutput("sampleAns3Alt")
+                   
                    # ifelse(bank3$Recursive[index$context3] && structureCheck3() && 
                    #          correct(context = index$context3, 
                    #                  bank = bank3, 
@@ -3008,6 +3093,77 @@ output$showLabelWarning <- reactive({
   show
 })
 
+labelFromDF <- function(df){
+  sentences <- "This plot shows the tree."
+  df$to <- regmatches(x = df$to, m = regexpr(pattern = "[ABCDEFGHIJKLM]", text = df$to))
+  for(row in 1:nrow(df)){
+    sentences <- paste0(sentences, " Edge ", row, " goes from ", df$from[row], " to ", 
+                       df$to[row], " and is labeled ", df$label[row], " with weight ",
+                       df$weight[row], ".")
+  }
+  sentences
+}
+
+output$exploreAlt <- renderUI({
+  full <- exploreDF()
+  full$label <- c("Infected", "Not Infected", "Positive", "Negative", 
+                   "Positive", "Negative")
+  print(labelFromDF(full))
+  tags$script(HTML(
+    paste0("$(document).ready(function() {
+                    document.getElementById('exploreGraph').setAttribute('aria-label', `",
+           labelFromDF(full),"`)
+                  })"
+  )))
+})
+
+output$graph1Alt <- renderUI({
+  full <- makeGraphDataFrame1()
+  full$label <- bank1[index$context1, 2:13][bank1[index$context1, 2:13] != "-"]
+  print(labelFromDF(full))
+  tags$script(HTML(
+    paste0("$(document).ready(function() {
+                    document.getElementById('graph1').setAttribute('aria-label', `",
+           labelFromDF(full),"`)
+                  })"
+    )))
+})
+
+output$graph2Alt <- renderUI({
+  full <- makeGraphDataFrame2()
+ 
+  f <- function(x){
+    x != "-"
+  }
+  print(Filter(f, bank2[index$context2, 2:13]))
+  full$label <- bank2[index$context2, 2:13][bank2[index$context2, 2:13] != "-"]
+  print(full$label)
+  print(labelFromDF(full))
+  tags$script(HTML(
+    paste0("$(document).ready(function() {
+                    document.getElementById('graph2').setAttribute('aria-label', `",
+           labelFromDF(full),"`)
+                  })"
+    )))
+})
+
+output$sampleAns3Alt <- renderUI({
+  full <- makeGraphDataFrame2()
+  
+  f <- function(x){
+    x != "-"
+  }
+  print(Filter(f, bank2[index$context2, 2:13]))
+  full$label <- bank2[index$context2, 2:13][bank2[index$context2, 2:13] != "-"]
+  print(full$label)
+  print(labelFromDF(full))
+  tags$script(HTML(
+    paste0("$(document).ready(function() {
+                    document.getElementById('graph2').setAttribute('aria-label', `",
+           labelFromDF(full),"`)
+                  })"
+    )))
+})
 # Makes sure that all of the buttons that "don't exist" still run
 outputOptions(output, "questionNumber1", suspendWhenHidden=FALSE)
 outputOptions(output, "contextNumber1", suspendWhenHidden=FALSE)
