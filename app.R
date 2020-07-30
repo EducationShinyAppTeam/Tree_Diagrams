@@ -2934,6 +2934,7 @@ output$sampleAns3 <- renderPlot({
                    layout = layout_as_tree(graph_from_data_frame(df), root=1), 
                    showProbs = F, 
                    colors=colors)
+    # Adjust corresponding alt text
     output$sampleAns3Alt <- renderUI({
       sentences <- "This plot shows the tree."
       for(row in 1:nrow(full)){
@@ -2956,6 +2957,7 @@ output$sampleAns3 <- renderPlot({
                    layout = layout_as_tree(graph_from_data_frame(df), root=1), 
                    showProbs = T, 
                    colors=colors)
+    # Adjust corresponding alt text
     output$sampleAns3Alt <- renderUI({
       sentences <- "This plot shows the tree."
       for(row in 1:nrow(full)){
@@ -2973,6 +2975,7 @@ output$sampleAns3 <- renderPlot({
   }
   # If probabilities are right too, include leaf node probabilities
   else{
+    # Adjust corresponding alt text
     output$sampleAns3Alt <- renderUI({
       sentences <- "This plot shows the tree."
       for(row in 1:nrow(full)){
@@ -3013,12 +3016,6 @@ observeEvent(input$showHint3, {
                  text = tags$div(
                    plotOutput("sampleAns3"), 
                    htmlOutput("sampleAns3Alt")
-                   
-                   # ifelse(bank3$Recursive[index$context3] && structureCheck3() && 
-                   #          correct(context = index$context3, 
-                   #                  bank = bank3, 
-                   #                  probs = probabilities3()), 
-                   #        bank3$labelDefs[index$context3], "")
                  )
                  
                  )
@@ -3068,7 +3065,6 @@ output$nextStep2 <- reactive({reset$setUp2}) # Allows ui to read reset$setUp2
 output$showAnsButton1 <- reactive({reset$ans1}) # Allows ui to read reset$ans3
 output$showAnsButton2 <- reactive({reset$ans2}) # Allows ui to read reset$ans3
 output$showHintButton3 <- reactive({reset$hint3}) # Allows ui to read reset$hint3
-#output$showAnsButton3 <- reactive({reset$ans3}) # Allows ui to read reset$ans3
 
 # Decides when to show label warning (level 3: that labels are too long)
 output$showLabelWarning <- reactive({
@@ -3093,9 +3089,13 @@ output$showLabelWarning <- reactive({
   show
 })
 
+# Creates alt text from a data frame of tree info
 labelFromDF <- function(df){
   sentences <- "This plot shows the tree."
-  df$to <- regmatches(x = df$to, m = regexpr(pattern = "[ABCDEFGHIJKLM]", text = df$to))
+  # If in a /n node /n probability case, takes only letter
+  df$to <- regmatches(x = df$to, 
+                      m = regexpr(pattern = "[ABCDEFGHIJKLM]", text = df$to))
+  # Creates actual text
   for(row in 1:nrow(df)){
     sentences <- paste0(sentences, " Edge ", row, " goes from ", df$from[row], " to ", 
                        df$to[row], " and is labeled ", df$label[row], " with weight ",
@@ -3104,11 +3104,13 @@ labelFromDF <- function(df){
   sentences
 }
 
+# Alt text for explore page
 output$exploreAlt <- renderUI({
+  # Create data frame including labels
   full <- exploreDF()
   full$label <- c("Infected", "Not Infected", "Positive", "Negative", 
                    "Positive", "Negative")
-  print(labelFromDF(full))
+  # Returned alt text
   tags$script(HTML(
     paste0("$(document).ready(function() {
                     document.getElementById('exploreGraph').setAttribute('aria-label', `",
@@ -3117,10 +3119,12 @@ output$exploreAlt <- renderUI({
   )))
 })
 
+# Level 1 alt text
 output$graph1Alt <- renderUI({
+  # Make data frame including labels
   full <- makeGraphDataFrame1()
   full$label <- bank1[index$context1, 2:13][bank1[index$context1, 2:13] != "-"]
-  print(labelFromDF(full))
+  # Returned alt text
   tags$script(HTML(
     paste0("$(document).ready(function() {
                     document.getElementById('graph1').setAttribute('aria-label', `",
@@ -3129,16 +3133,12 @@ output$graph1Alt <- renderUI({
     )))
 })
 
+# Level 2 alt text
 output$graph2Alt <- renderUI({
+  # make data frame including labels
   full <- makeGraphDataFrame2()
- 
-  f <- function(x){
-    x != "-"
-  }
-  print(Filter(f, bank2[index$context2, 2:13]))
   full$label <- bank2[index$context2, 2:13][bank2[index$context2, 2:13] != "-"]
-  print(full$label)
-  print(labelFromDF(full))
+  # Returned alt text
   tags$script(HTML(
     paste0("$(document).ready(function() {
                     document.getElementById('graph2').setAttribute('aria-label', `",
@@ -3147,23 +3147,6 @@ output$graph2Alt <- renderUI({
     )))
 })
 
-output$sampleAns3Alt <- renderUI({
-  full <- makeGraphDataFrame2()
-  
-  f <- function(x){
-    x != "-"
-  }
-  print(Filter(f, bank2[index$context2, 2:13]))
-  full$label <- bank2[index$context2, 2:13][bank2[index$context2, 2:13] != "-"]
-  print(full$label)
-  print(labelFromDF(full))
-  tags$script(HTML(
-    paste0("$(document).ready(function() {
-                    document.getElementById('graph2').setAttribute('aria-label', `",
-           labelFromDF(full),"`)
-                  })"
-    )))
-})
 # Makes sure that all of the buttons that "don't exist" still run
 outputOptions(output, "questionNumber1", suspendWhenHidden=FALSE)
 outputOptions(output, "contextNumber1", suspendWhenHidden=FALSE)
