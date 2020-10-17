@@ -8,6 +8,7 @@ library(igraph)
 library(dplyr)
 library(shinyjs)
 library(shinyWidgets)
+options(dplyr.summarise.inform = FALSE) # Prevents annoying warning message
 
 # App Meta Data----------------------------------------------------------------
 APP_TITLE <<- "Tree Diagrams"
@@ -79,8 +80,8 @@ ui <- list(
           
           h2("Instructions"), 
           tags$ol(
-            tags$li("If necessary, review prerequiste ideas using the 
-                    Prerequistes tab."), 
+            tags$li("If necessary, review prerequisite ideas using the 
+                    Prerequisites tab."), 
             tags$li("Explore the effects of changing probabilities in the tree 
                     using the Explore tab."), 
             tags$li("Challenge yourself to build trees for various contexts in 
@@ -119,8 +120,8 @@ ui <- list(
             following:"), 
           tags$ul(
             tags$li("The Law of Total Probability: the probability that an event 
-            occurs is equivalent to the sum of of the conditional probabilities 
-            of the event occuring given a partition of the sample space, i.e. 
+            occurs is equivalent to the sum of the conditional probabilities 
+            of the event occurring given a partition of the sample space, i.e. 
             \\(\\sum_{i=1}^j P(B|A_i)P(A_i)\\) for events \\(A\\) and \\(B\\) 
             where the \\(A_i\\)'s form a partition of \\(A\\)."), 
             tags$li("The basic rules of probability, which are reviewed in ", 
@@ -257,7 +258,7 @@ ui <- list(
                      p("In this section, you will build a probability tree from 
                      a given context. First choose the number of options 
                      (branches exiting) for each node. Then input the 
-                     probabilties associated with each of these options. 
+                     probabilities associated with each of these options. 
                      Displaying the edge labels would be helpful in clarifying 
                      which option should be associated with which node. Once you 
                      have created your tree make sure to check your work."), 
@@ -1993,7 +1994,7 @@ p <- function(context, probabilities2, probabilities3, bank){
         to <- c(to, nodeNames[13])
       }
     }
-    # Adjust for irrelevant nodes if necessary (no irrelavant nodes and not the all 2s case)
+    # Adjust for irrelevant nodes if necessary (no irrelevant nodes and not the all 2s case)
     if(!is.null(probabilities) && length(irrelevantNodes)>0 && 
        ncol(probabilities)==3){
       badNodes <- irrelevantNodes-1
