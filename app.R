@@ -8,6 +8,7 @@ library(igraph)
 library(dplyr)
 library(shinyjs)
 library(shinyWidgets)
+library(ggplot2)
 options(dplyr.summarise.inform = FALSE) # Prevents annoying warning message
 
 # App Meta Data----------------------------------------------------------------
@@ -28,15 +29,15 @@ bank3 <- read.csv("Context_Bank_L3.csv", header = TRUE) # Read in question bank 
 
 # Define UI for App
 ui <- list(
-  useShinyjs(), 
-  tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", 
-  href = "https://educationshinyappteam.github.io/Style_Guide/theme/boast.css"), 
-  tags$style(HTML("
-    .shiny-output-error-validation {
-    color: red;
-    }"))
-  ), 
+   useShinyjs(), 
+#   tags$head(
+#     tags$link(rel = "stylesheet", type = "text/css", 
+#   href = "https://educationshinyappteam.github.io/Style_Guide/theme/boast.css"), 
+#   tags$style(HTML("
+#     .shiny-output-error-validation {
+#     color: red;
+#     }"))
+#   ), 
   
   ## Create the app page
   dashboardPage(
@@ -46,6 +47,12 @@ ui <- list(
       titleWidth=250, 
       title = "Tree Diagrams", # You may use a shortened form of the title here
       tags$li(class = "dropdown", actionLink("info", icon("info"))), 
+      tags$li(
+        class = "dropdown",
+        tags$a(target = "_blank", icon("comments"),
+               href = "https://pennstate.qualtrics.com/jfe/form/SV_7TLIkFtJEJ7fEPz?appName=Tree_Diagrams"
+        )
+      ),
       tags$li(class = "dropdown", 
               tags$a(href='https://shinyapps.science.psu.edu/', 
                      icon("home")))
@@ -54,7 +61,7 @@ ui <- list(
     dashboardSidebar(
       width = 250, 
       sidebarMenu(
-        id = "tabs", 
+        id = "pages", 
         menuItem("Overview", tabName = "Overview", icon = icon("tachometer-alt")), 
         menuItem("Prerequisites", tabName = "Prerequisites", icon = icon("book")), 
         menuItem("Explore", tabName = "Explore", icon = icon("wpexplorer")), 
@@ -74,9 +81,8 @@ ui <- list(
           tabName = "Overview", 
           withMathJax(), 
           h1("Tree Diagrams"), # This should be the full name.
-          p("Probability trees are useful tools for visualizing various problems 
-          pertaining to probability. In this app, you will explore tree diagrams 
-          and their uses in solving problems involving probability."), 
+          p("In this app, you will explore tree diagrams and their uses in 
+            solving probability problems."), 
           
           h2("Instructions"), 
           tags$ol(
@@ -90,7 +96,7 @@ ui <- list(
           
           ##### Go Button--location will depend on your goals
           div(
-            style = "text-align: center", 
+            style = "text-align: center;", 
             bsButton(
               inputId = "go1", 
               label = "GO!", 
@@ -108,7 +114,7 @@ ui <- list(
             br(), 
             br(), 
             br(), 
-            div(class = "updated", "Last Update: 6/10/2020 by LMH.")
+            div(class = "updated", "Last Update: 11/13/2020 by LMH.")
           )
         ), 
         #### Set up the Prerequisites Page ----
@@ -119,17 +125,19 @@ ui <- list(
           p("In order to get the most out of this app, please review the
             following:"), 
           tags$ul(
-            tags$li("The Law of Total Probability: the probability that an event 
-            occurs is equivalent to the sum of the conditional probabilities 
-            of the event occurring given a partition of the sample space, i.e. 
-            \\(\\sum_{i=1}^j P(B|A_i)P(A_i)\\) for events \\(A\\) and \\(B\\) 
-            where the \\(A_i\\)'s form a partition of \\(A\\)."), 
             tags$li("The basic rules of probability, which are reviewed in ", 
                     tags$a(href="https://online.stat.psu.edu/stat100/lesson/7/7.1", 
-                           "these notes")), 
+                           "these notes", class = "bodylinks")), 
             tags$li("The basic rules of conditional probability, which are reviewed in ", 
                     tags$a(href="https://online.stat.psu.edu/stat200/lesson/2/2.1/2.1.3/2.1.3.2/2.1.3.2.5", 
-                           "these notes"))
+                           "these notes", class = "bodylinks")),
+            tags$li("The Law of Total Probability: the probability that an event 
+            occurs is equivalent to the sum of the probabilities of the event 
+            occurring along with each possibility in a partition of the sample 
+            space, i.e. 
+            \\[P(B)=\\sum_{i=1}^j P\\left(B \\cap A_{i}\\right)=\\sum_{i=1}^jP
+            \\left(B|A_{i}\\right)P(A_{i})\\]  for events \\(A\\) and \\(B\\) 
+            where the \\(A_i\\)'s form a partition of \\(S\\).")
             
           ),
           br(),
@@ -149,11 +157,11 @@ ui <- list(
         tabItem(
           tabName = "Explore", 
           h2("Explore"), 
-          p("In this section you will explore tree diagrams. First, read the 
+          p("In this section you will explore how to interpret tree diagrams. First, read the 
           context and answer the question posed. Once you are ready to move on 
           to the next step, click the Next Step button when you will be able to 
           move the prevalence slide to change the number of people in the 
-          population that truly has the disease and observe the effects of these 
+          population that truly have the disease and observe the effects of these 
           changes."), 
           h3("Context"), 
           p("Through the winter and spring of 2020, COVID-19 spread over the 
@@ -167,23 +175,24 @@ ui <- list(
           sidebarLayout(
             sidebarPanel(
               # First (and only) question for explore tab 
-              p("What is the chance that a randomly selected American 
-                           would show a positive antibody test in the original 
-                           problem?"),
+              p("What is the probability that a randomly selected American 
+                           would show a positive antibody test?"),
               fluidRow(
               column(width = 10, numericInput("exploreAns", 
-                           "Enter Probability", 
-                           value = .5, min = 0, max = 1, step = .01)),
+                           "Enter your answer for the probability", 
+                           value = NA, min = 0, max = 1, step = .01)),
               column(width=2, br(), uiOutput("exploreCorrectnessPic"))
               ),
-              fluidRow(
-                column(width = 6, actionButton("checkExplore", "Check Answer")), 
-                # Click to go to rest of problem
-                column(width = 6, actionButton("next", "Next Step")) 
-              ), 
+              # fluidRow(
+              #   column(width = 6, bsButton("checkExplore", "Check Answer", size = "large")), 
+              #   # Click to go to rest of problem
+              #   column(width = 6, bsButton("next", "Next Step", size = "large")) 
+              # ), 
+              bsButton("checkExplore", "Check Answer", size = "large"),
+              bsButton("nextStep", "Next Step", size = "large"),
               
               # Prevalence slider
-              conditionalPanel(condition = "input.next", 
+              conditionalPanel(condition = "input.nextStep", 
               p("Of course, the true prevalence of the antibodies in the 
               American population is unknown and the 3% figure would also vary 
               greatly from state-to-state. Move the prevalence slider to see how 
@@ -213,11 +222,19 @@ ui <- list(
               # )),
                htmlOutput("exploreAlt"),
               # Outputted text for part 2
-              conditionalPanel(condition = "input.next", 
-                               textOutput("posTest"), # Probability of positive test
-                               textOutput("falseP"), # False Positive given positive
-                               textOutput("falseN")) # False negative given negative
+              conditionalPanel(condition = "input.nextStep", 
+                               # textOutput("posTest"), # Probability of positive test
+                               # textOutput("falseP"), # False Positive given positive
+                               # textOutput("falseN"), # False negative given negative
+                               plotOutput("exploreProbPlot"))
             )
+          ),
+            bsButton(
+              inputId = "exToCh",
+              label = "Go to Challenge", 
+              size = "large", 
+              icon = icon("bolt")
+            
           )
         ), 
         
@@ -230,7 +247,7 @@ ui <- list(
             # Instructions ----
             tabPanel("Instructions", value = "instructions", 
                      h2("Instructions"), 
-                     p("The following challenge will allow you to build your own 
+                     p("The following challenges will allow you to build your own 
                      trees from context in order to answer questions. The 
                      section is divided into three levels:"), 
                      tags$ul(
@@ -242,13 +259,12 @@ ui <- list(
                                 deciding both the structure of the tree and the 
                                 appropriate probabilities before answering 
                                 questions."), 
-                       tags$li("Level 3: Like in Level 2, you will develop a 
-                                tree from scratch, but the problems will include 
-                                added twists such as recursive trees and edge
-                                probabilities that require calculations to find. 
-                                This level also disables the validation messages 
-                                given as hints in the first two levels adding an
-                                extra challenge.")
+                       tags$li("Level 3: Level 3: You will develop a tree from 
+                               scratch, but the problems will include added 
+                               twists such as recursive trees and edge 
+                               probabilities that require calculations to find. 
+                               This level also disables the validation messages 
+                               given as hints in the first two levels.")
                      )), 
             
             # Level 1: give structure, make them input all probabilities, 
@@ -268,9 +284,9 @@ ui <- list(
                      p("You can try various different contexts, each of which 
                        has a set of questions."), 
                      h3("Context"), 
-                     uiOutput('contNum1'), 
+                     #uiOutput('contNum1'), 
                      textOutput("context1"), 
-                     actionButton("newContext1", "Next Context"), 
+                     bsButton("newContext1", "Next Context", size = "large"), 
                      conditionalPanel(
                        condition="output.contextNumber1", 
                        p("Note: This is the final context currently implemented. 
@@ -285,7 +301,7 @@ ui <- list(
                          uiOutput("uMat31"), 
                          
                          # Check entries for edge weights
-                         actionButton("checkMat1", "Check Weights"), 
+                         bsButton("checkMat1", "Check Your Probabilities", size = "large"), 
                          fluidRow(
                            column(width=2, uiOutput("correctnessPic1")), 
                            column(width=10, textOutput("correctnessText1"))
@@ -310,8 +326,8 @@ ui <- list(
                 })"
                          )),
                          htmlOutput("graph1Alt"),
+                         bsButton("newQuestion1", "Next Question", size = "large"),
                          textOutput("question1"),
-                         actionButton("newQuestion1", "Next Question"),
                          conditionalPanel(
                        condition="output.questionNumber1",
                        p("Note: This is the final question for this context.
@@ -322,7 +338,7 @@ ui <- list(
                        fluidRow(
                          column(width = 3, numericInput("comboProb1", 
                                                         "Enter Answer", 
-                                                        value=0, 
+                                                        value=NA, 
                                                         min=0, 
                                                         max=1, 
                                                         step=.01, 
@@ -330,13 +346,15 @@ ui <- list(
                          column(width = 2,  br(), uiOutput("correctnessPicCombo1"))),
                        fluidRow(
                          div(id="question1", 
-                             column(width=4, actionButton("comboCheck1", 
-                                                          "Check Your Answer") 
+                             column(width=4, bsButton("comboCheck1", 
+                                                          "Check Answer", 
+                                                      size = "large") 
                                     ), 
                              conditionalPanel(condition="output.showAnsButton1", 
                                               column(width=8, 
-                                              actionButton("showAns1", 
-                                                           "Show Answer"), 
+                                              bsButton("showAns1", 
+                                                           "Show Answer", 
+                                                       size = "large"), 
                                               textOutput("answer1"))
                                               ))), 
                        width=8))), 
@@ -358,9 +376,10 @@ ui <- list(
                    p("You can try various different contexts, each of which has 
                      a set of questions."), 
                    h3("Context"), 
-                   uiOutput('contNum2'), 
+                   #uiOutput('contNum2'), 
                    textOutput("context2"), 
-                   actionButton("newContext2", "Next Context"),  
+                   bsButton("newContext2", "Next Context", 
+                            size = "large"),  
                    conditionalPanel(
                      condition="output.contextNumber2", 
                      p("Note: This is the final context currently implemented. 
@@ -417,8 +436,10 @@ ui <- list(
                                               width='60px'), 
                                   width=4))
                        ), 
-                       actionButton("checkStep2", "Check Answer"), 
-                       actionButton("skip", "Skip this Step"), 
+                       bsButton("checkStep2", "Check Answer", 
+                                size = "large"), 
+                       bsButton("skip", "Skip this Step", 
+                                size = "large"), 
                        fluidRow(
                          column(width=2, uiOutput("stepCheckPic")),
                          column(width = 10, textOutput("stepCheckFeedback")),
@@ -440,7 +461,8 @@ ui <- list(
                        ), 
 
                        # Check entries for edge weights
-                       actionButton("checkMat2", "Check Weights"), 
+                       bsButton("checkMat2", "Check Weights", 
+                                size = "large"), 
                        fluidRow(
                          column(width=2, uiOutput("correctnessPic2")), 
                          column(width=10, textOutput("correctnessText2"))
@@ -477,9 +499,10 @@ ui <- list(
                 # })"
                 #        )),
                        htmlOutput("graph2Alt"),       
-                
+                       bsButton("newQuestion2", "Next Question", 
+                                size = "large"), 
                        textOutput("question2"), 
-                        actionButton("newQuestion2", "Next Question"), 
+                        
                               conditionalPanel(
                                 condition="output.questionNumber2", 
                                 p("Note: This is the final question for this 
@@ -491,7 +514,7 @@ ui <- list(
                        fluidRow(
                          column(width = 3, numericInput("comboProb2", 
                                                         "Enter Answer", 
-                                                        value=0, 
+                                                        value=NA, 
                                                         min=0, 
                                                         max=1, 
                                                         step=.01, 
@@ -501,12 +524,14 @@ ui <- list(
                        fluidRow(
                          div(id="question2", 
                              column(width=4, 
-                                    actionButton("comboCheck2", 
-                                                 "Check Your Answer")
+                                    bsButton("comboCheck2", 
+                                                 "Check Answer", 
+                                             size = "large")
                              ), 
                              conditionalPanel(condition="output.showAnsButton2", 
                              column(width=8, 
-                                    actionButton("showAns2", "Show Answer"), 
+                                    bsButton("showAns2", "Show Answer", 
+                                             size = "large"), 
                                     textOutput("answer2"))
                              )))), 
                        width=8
@@ -517,9 +542,10 @@ ui <- list(
                  p("You can try various different contexts, each of which has a 
                    set of questions."), 
                  h3("Context"), 
-                 uiOutput('contNum3'), 
+                 #uiOutput('contNum3'), 
                  textOutput("context3"), 
-                 actionButton("newContext3", "Next Context"), 
+                 bsButton("newContext3", "Next Context", 
+                          size = "large"), 
                  conditionalPanel(
                    condition="output.contextNumber3", 
                    p("Note: This is the final context currently implemented. 
@@ -595,7 +621,7 @@ ui <- list(
                                 graph. Consider using shorter labels.", 
                                 class="redtext")), 
             checkboxInput("showWeightOptions", 
-                          "Show options for edge weights", 
+                          "Show options for edge probabilities", 
                           value=TRUE), 
             conditionalPanel(
               condition="input.showWeightOptions", 
@@ -612,12 +638,13 @@ ui <- list(
             p("Input edge probabilities below nodes with 3 children:"), 
             uiOutput("uMat33")
              )), 
+            conditionalPanel(condition = "output.showRecursive",
             checkboxInput("recursionOptions", 
                           "Show options for recursive nodes", 
                           value=FALSE), 
             conditionalPanel(condition="input.recursionOptions", 
                              uiOutput("recursiveButtons")
-          )), 
+          ))), 
           mainPanel(
             conditionalPanel(
               condition="(input.nchildB3 == 0 && input.nchildC3 != 0) || 
@@ -636,8 +663,9 @@ ui <- list(
                   the inputs with node A as the root node.`)
                 })"
             )),
+            bsButton("newQuestion3", "Next Question", 
+                     size = "large"), 
             textOutput("question3"), 
-            actionButton("newQuestion3", "Next Question"), 
                    conditionalPanel(
                      condition="output.questionNumber3", 
                      p("Note: This is the final question for this context. 
@@ -648,21 +676,24 @@ ui <- list(
             # Answer questions about scenario
             fluidRow(
               column(width = 3, numericInput("comboProb3", "Enter Answer", 
-                                  value=0, min=0, max=1, step=.01, width="150px")),
+                                  value=NA, min=0, max=1, step=.01, width="150px")),
               column(width = 2, br(), uiOutput("correctnessPicCombo3"))
             ),
             fluidRow(
               div(id="question3", 
                   column(width=3, 
-                         actionButton("comboCheck3", "Check Your Answer"), 
+                         bsButton("comboCheck3", "Check Answer", 
+                                  size = "large"), 
                          ), 
                   conditionalPanel(
                     condition="output.showHintButton3", 
                   column(width=2, 
-                           actionButton("showHint3", "Hint")
+                           bsButton("showHint3", "Hint", 
+                                    size = "large")
                          ), 
                   column(width=7, 
-                         actionButton("showAns3", "Show Answer"), 
+                         bsButton("showAns3", "Show Answer", 
+                                  size = "large"), 
                          textOutput("answer3")), 
                   br(), 
                   textOutput("tryAgain3")
@@ -771,7 +802,7 @@ server <- function(input, output, session) {
     eventExpr = input$go1, 
     handlerExpr = { 
       updateTabItems(session, 
-                     inputId = "tabs", 
+                     inputId = "pages", 
                      selected = "Explore" 
       ) 
     })
@@ -781,12 +812,25 @@ server <- function(input, output, session) {
     eventExpr = input$go2, 
     handlerExpr = { 
       updateTabItems(session, 
-                     inputId = "tabs", 
+                     inputId = "pages", 
                      selected = "Explore" 
+      ) 
+    })
+  
+  # Go button on explore page
+  observeEvent(
+    eventExpr = input$exToCh, 
+    handlerExpr = { 
+      updateTabItems(session, 
+                     inputId = "pages", 
+                     selected = "Challenge" 
       ) 
     })
 
   # EXPLORE TAB ----
+  
+  # Only let Next button be hit once
+  observeEvent(input$nextStep, {updateButton(session, "nextStep", disabled = TRUE)})
 
   # Output text for probability of a positive test
   output$posTest <- renderText({
@@ -808,6 +852,31 @@ server <- function(input, output, session) {
     paste("Probability that a positive test is a false positive: ", 
           format(round(1-((edgeLabels[1]*edgeLabels[3])/pPos), 4), scientific=F))})
   
+  # Plot for eplore tab percentages
+  output$exploreProbPlot <- renderPlot({
+    edgeLabels <- c(input$prevalence, 1-input$prevalence, .98, .02, .03, .97)
+    pNeg <- round(edgeLabels[1]*edgeLabels[4]+edgeLabels[2]*edgeLabels[6], 4)
+    pPos <- round(edgeLabels[1]*edgeLabels[3]+edgeLabels[2]*edgeLabels[5], 4)
+    data <- data.frame("Name" = c("Probability of \n getting a \n positive test: ",
+                                  "Probability that a \n negative test is a \n false negative",
+                                  "Probability that a \n positive test is a \n false positive: "),
+                       "Value" = c(edgeLabels[1]*edgeLabels[3]+edgeLabels[2]*edgeLabels[5],
+                                   round((edgeLabels[1]*edgeLabels[4])/pNeg, 4),
+                                   round(1-((edgeLabels[1]*edgeLabels[3])/pPos), 4)))
+    ggplot(aes(x = Name, y = Value), data = data) +
+      geom_bar(stat = "identity")+
+      geom_text(aes(y = Value + .06, label=Value), position=position_dodge(width=.9), vjust=-.25, size = 5) +
+      ylim(0, 1.06) +
+      coord_flip() +
+      xlab("") +
+      theme(axis.text = element_text(size=18),
+            plot.title = element_text(size=18, face="bold"),
+            axis.title = element_text(size=18),
+            panel.background = element_rect(fill = "white", color="black"),
+            legend.position=c(.89,1.07),
+            legend.text = element_text(size=14))
+    
+  })
   # Create data frame for explore tab
   exploreDF <- reactive({
     # Creates the 6 edges of the graph
@@ -865,7 +934,7 @@ server <- function(input, output, session) {
   
   # Add either check or X when user checks their answer (ecp=Explore Correctness Pic)
   ecp <- eventReactive(input$checkExplore, {
-    if(input$exploreAns == .0585){
+    if(!is.na(input$exploreAns) && input$exploreAns == .0585){
       img(src = "check.PNG", width = 30) }
     else{
       img(src = "cross.PNG", width = 30)
@@ -1163,21 +1232,21 @@ server <- function(input, output, session) {
       c(index$context3, 1:(index$context3-1), (index$context3+1):nrow(bank3))
     }
   })
-  # Select inputs for context number for all 3 levels
-  output$contNum1 <- renderUI({selectInput("contextNum1", 
-                                           "Context number", 
-                                           choices = contNums1(), 
-                                           selectize = FALSE, 
+  #Select inputs for context number for all 3 levels
+  output$contNum1 <- renderUI({selectInput("contextNum1",
+                                           "Context number",
+                                           choices = contNums1(),
+                                           selectize = FALSE,
                                            width = "150px")})
-  output$contNum2 <- renderUI({selectInput("contextNum2", 
-                                           "Context number", 
-                                           choices = contNums2(), 
-                                           selectize = FALSE, 
+  output$contNum2 <- renderUI({selectInput("contextNum2",
+                                           "Context number",
+                                           choices = contNums2(),
+                                           selectize = FALSE,
                                            width = "150px")})
-  output$contNum3 <- renderUI({selectInput("contextNum3", 
-                                           "Context number", 
-                                           choices = contNums3(), 
-                                           selectize = FALSE, 
+  output$contNum3 <- renderUI({selectInput("contextNum3",
+                                           "Context number",
+                                           choices = contNums3(),
+                                           selectize = FALSE,
                                            width = "150px")})
   
   # If changing the question number using the select input
@@ -1413,15 +1482,15 @@ p <- function(context, probabilities2, probabilities3, bank){
         p2 <- as.data.frame(matrix2)
         if(numeric){
           if(input$nchildB3==0){
-            p2$Center <- c(rep(0, nrow(matrix2)))
+            p2$Center <- c(rep(0, nrow(p2)))
             p2["B", ] = rep(0, 3)
           }
           if(input$nchildC3==0){
-            p2$Center <- c(rep(0, nrow(matrix2)))
+            p2$Center <- c(rep(0, nrow(p2)))
             p2["C", ] = rep(0, 3)
           }
           if(input$nchildD3==0){
-            p2$Center <- c(rep(0, nrow(matrix2)))
+            p2$Center <- c(rep(0, nrow(p2)))
             p2["D", ] = rep(0, 3)
           }
           
@@ -1429,15 +1498,15 @@ p <- function(context, probabilities2, probabilities3, bank){
         # Adds "dummy" rows for any nonexistent rows for labels case
         else{
           if(input$nchildB3==0){
-            p2$Center <- c(rep("", nrow(matrix2)))
+            p2$Center <- c(rep("", nrow(p2)))
             p2["B", ] = rep("", 3)
           }
           if(input$nchildC3==0){
-            p2$Center <- c(rep("", nrow(matrix2)))
+            p2$Center <- c(rep("", nrow(p2)))
             p2["C", ] = rep("", 3)
           }
           if(input$nchildD3==0){
-            p2$Center <- c(rep("", nrow(matrix2)))
+            p2$Center <- c(rep("", nrow(p2)))
             p2["D", ] = rep("", 3)
           }}
         probs <- p2[order(row.names(p2)), ]
@@ -1592,7 +1661,8 @@ p <- function(context, probabilities2, probabilities3, bank){
       else{
         if(numeric){
           weight <- c(weight, rep(0, 3))
-        round(weight, 2)}
+        #round(weight, 2)
+        }
         else{weight <- c(weight, rep("", 3)) }
       }}
       }
@@ -1708,16 +1778,20 @@ p <- function(context, probabilities2, probabilities3, bank){
     # Sort the labels 
     goodNodes <- sort(goodNodes)
     
+    if(length(goodNodes>0)){
+    
     # Create a matrix where left probability is always 1 of the right size
     if(numeric){matrix(c(rep(1, length(goodNodes)), rep(0, length(goodNodes))), 
                        nrow=length(goodNodes), 
                        dimnames = list(goodNodes, c("Left", "Right")))}
     # Create a matrix defaulted to Lab 1 and Lab 2 for all labels
-    else{matrix(rep(c("Lab 1", "Lab 2"), length(goodNodes)), 
+    else{
+      matrix(rep(c("Lab 1", "Lab 2"), length(goodNodes)), 
                 byrow=TRUE, 
                 nrow=length(goodNodes), 
                 dimnames = list(goodNodes, c("Left", "Right")))}
-  }
+    }
+    else{NULL}}
   
   # Creates the initial matrix for the 3 children nodes for level 3 specifically
   bMat33 <- function(numeric){
@@ -1955,7 +2029,15 @@ p <- function(context, probabilities2, probabilities3, bank){
     # Make actual data frame
     df <- data.frame(from=from, to=to)
     df <- df[order(df$from), ]
-    df$weight <- weight
+    # Every now and again, I see an error (which only lasts about half a second) 
+    # come from here; I have not seen it since implementing the trycatch and 
+    # never figured out how to consistently reproduce it
+    tryCatch({df$weight <- weight},
+             warning = function(war){},
+             error = function(err){
+               df$weight <- rep(0, nrow(df))},
+             finally = {})
+    
     df
   })
   
@@ -2496,6 +2578,7 @@ p <- function(context, probabilities2, probabilities3, bank){
     if(length(weights)==6){
       probs <- c(weights[1]*weights[3], weights[1]*weights[4], 
                  weights[2]*weights[5], weights[2]*weights[6])
+      names <- c("E", "F", "H", "I")
     }
     else{
       atEnd <-c()
@@ -2518,8 +2601,8 @@ p <- function(context, probabilities2, probabilities3, bank){
         
       }
       probs <- c(probs, atEnd)
-    }
-    names <-c(names, namesAtEnd)  
+    
+    names <-c(names, namesAtEnd)  }
     matrix(probs, nrow=length(leafNodes), ncol=1, dimnames=list(names, NULL))
   }
   # Calculates the correct probabilities
@@ -2746,12 +2829,19 @@ observeEvent(input$newContext2, {
   # Move index to next context
   if(index$context2<nrow(bank2)){index$context2 <- index$context2+1} 
   else{index$context2 <- 1}
+  index$question2 <- 1
   # Re-hide all shown answers and feedback
   reset$weight <- FALSE 
   reset$question <- FALSE
   reset$answer <- FALSE
   reset$ans2 <- FALSE
-  updateNumericInput(session, "comboProb2", value=0)
+  reset$setUp2 <- FALSE
+  updateSelectInput(session, "nchildA2", selected = 2)
+  updateSelectInput(session, "nchildB2", selected = 2)
+  updateSelectInput(session, "nchildC2", selected = 2)
+  updateSelectInput(session, "nchildD2", selected = 2)
+  updateNumericInput(session, "comboProb2", value=NA)
+  
 })
 # For Level 3
 observeEvent(input$newContext3, {
@@ -3066,6 +3156,7 @@ output$nextStep2 <- reactive({reset$setUp2}) # Allows ui to read reset$setUp2
 output$showAnsButton1 <- reactive({reset$ans1}) # Allows ui to read reset$ans3
 output$showAnsButton2 <- reactive({reset$ans2}) # Allows ui to read reset$ans3
 output$showHintButton3 <- reactive({reset$hint3}) # Allows ui to read reset$hint3
+output$showRecursive <- reactive(bank3$Recursive[index$context3] == 1)
 
 # Decides when to show label warning (level 3: that labels are too long)
 output$showLabelWarning <- reactive({
@@ -3165,6 +3256,11 @@ outputOptions(output, "showHintButton3", suspendWhenHidden=FALSE)
 outputOptions(output, "showAnsButton1", suspendWhenHidden=FALSE)
 outputOptions(output, "showAnsButton2", suspendWhenHidden=FALSE)
 outputOptions(output, "recursiveButtons", suspendWhenHidden=FALSE)
+outputOptions(output, "showRecursive", suspendWhenHidden=FALSE)
+outputOptions(output, "contNum1", suspendWhenHidden=FALSE)
+outputOptions(output, "contNum2", suspendWhenHidden=FALSE)
+outputOptions(output, "contNum3", suspendWhenHidden=FALSE)
+
 
 }
 # Create Shiny App using BOAST App template
