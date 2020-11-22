@@ -51,7 +51,7 @@ ui <- list(
       tags$li(
         class = "dropdown",
         tags$a(target = "_blank", icon("comments"),
-               href = "https://pennstate.qualtrics.com/jfe/form/SV_7TLIkFtJEJ7fEPz?appName = Tree_Diagrams"
+               href = "https://pennstate.qualtrics.com/jfe/form/SV_7TLIkFtJEJ7fEPz?appName=Tree_Diagrams"
         )
       ),
       tags$li(class = "dropdown", 
@@ -945,9 +945,11 @@ server <- function(input, output, session) {
   # Add either check or X when user checks their answer (ecp = Explore Correctness Pic)
   ecp <- eventReactive(input$checkExplore, {
     if(!is.na(input$exploreAns) && input$exploreAns == .0585){
-      img(src = "check.PNG", width = 30) }
+      #img(src = "check.PNG", width = 30) 
+      renderIcon(icon = "correct", html = TRUE)}
     else{
-      img(src = "cross.PNG", width = 30)
+      #img(src = "cross.PNG", width = 30)
+      renderIcon(icon = "incorrect", html = TRUE)
     }
   })
   output$exploreCorrectnessPic <- renderUI({ecp()})
@@ -1050,7 +1052,7 @@ server <- function(input, output, session) {
             #reset$setUp2 <- TRUE
             #reset$setUpAns2 <- FALSE
             output$stepCheckPic <- renderUI({
-              img(src = "check.PNG", alt = "Correct Answer", width = 30)})
+              renderIcon(icon = "correct", html = TRUE, width = 30)})
             "Good Job! You are Correct! Click the Next Step button to proceed to the next
     part of the question."
         }
@@ -1061,26 +1063,20 @@ server <- function(input, output, session) {
              input$label22 == labels[bank2$correctLabel1[index$context2]] && 
              input$label32 == labels[bank2$correctLabel1[index$context2]] && 
              input$label42 == labels[bank2$correctLabel1[index$context2]]){
-            output$stepCheckPic <- renderUI({img(src = "check.PNG", 
-                                                 alt = "Correct Answer",
-                                                 width = 30)})
+            output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
             "This is a valid set up for this problem, but the structure of the 
             context makes a different form of the tree easier to work with in 
             this case."
           }
           else{
-            output$stepCheckPic <- renderUI({img(src = "cross.PNG", 
-                                                 alt = "Incorrect Answer", 
-                                                 width = 30)})
+            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
             "You have a correct structure for the tree, but the labels you have 
             chosen are not correct. There is another form of the tree that would 
             be easier to work with for this problem."
           }
         }
           else{
-            output$stepCheckPic <- renderUI({img(src = "cross.PNG", 
-                                                 alt = "Incorrect Answer", 
-                                                 width = 30)})
+            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
             "Check the labels you have chosen."
           }
       }
@@ -1091,9 +1087,7 @@ server <- function(input, output, session) {
            input$label32 == labels[bank2$correctLabel2[index$context2]]){ 
           #reset$setUpAns2 <- FALSE
           #reset$setUp2 <- TRUE
-          output$stepCheckPic <- renderUI({img(src = "check.PNG", 
-                                               alt = "Correct Answer", 
-                                               width = 30)})
+          output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
           "Good Job! You are Correct! Click the Next Step button to proceed to the next
     part of the question."
           
@@ -1103,26 +1097,20 @@ server <- function(input, output, session) {
           if(input$label12 == labels[bank2$correctLabel2[index$context2]] && 
              input$label22 == labels[bank2$correctLabel1[index$context2]] && 
              input$label32 == labels[bank2$correctLabel1[index$context2]]){
-            output$stepCheckPic <- renderUI({img(src = "check.PNG", 
-                                                 alt = "Correct Answer", 
-                                                 width = 30)})
+            output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
             "This is a valid set up for this problem, but the structure of the 
             context makes a different form of the tree easier to work with in 
             this case."
           }
           else{
-            output$stepCheckPic <- renderUI({img(src = "cross.PNG", 
-                                                 alt = "Incorrect Answer", 
-                                                 width = 30)})
+            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
             "You have a correct structure for the tree, but the labels you have 
             chosen are not correct. There is another form of the tree that would 
             be easier to work with for this problem."
           }
         }
         else{
-          output$stepCheckPic <- renderUI({img(src = "cross.PNG", 
-                                               alt = "Incorrect Answer", 
-                                               width = 30)})
+          output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
           "Check the labels you have chosen."
         }
       }
@@ -1143,17 +1131,13 @@ server <- function(input, output, session) {
              input$label22 == labels[bank2$correctLabel1[index$context2]] && 
              input$label32 == labels[bank2$correctLabel1[index$context2]] && 
              input$label42 == labels[bank2$correctLabel1[index$context2]]){
-            output$stepCheckPic <- renderUI({img(src = "check.PNG", 
-                                                 alt = "Correct Answer", 
-                                                 width = 30)})
+            output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
             "This is a valid set up for this problem, but the structure of the 
             context makes a different form of the tree easier to work with in 
             this case."
           }
           else{
-            output$stepCheckPic <- renderUI({img(src = "cross.PNG", 
-                                                 alt = "Incorrect Answer", 
-                                                 width = 30)})
+            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
             "You have a correct structure for the tree, but the labels you have 
             chosen are not correct. There is another form of the tree that would 
             be easier to work with for this problem."
@@ -1164,25 +1148,19 @@ server <- function(input, output, session) {
           if(input$label12 == labels[bank2$correctLabel2[index$context2]] && 
              input$label22 == labels[bank2$correctLabel1[index$context2]] && 
              input$label32 == labels[bank2$correctLabel1[index$context2]]){
-            output$stepCheckPic <- renderUI({img(src = "check.PNG", 
-                                                 alt = "Correct Answer", 
-                                                 width = 30)})
+            output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
             "This is a valid set up for this problem, but the structure of the 
             context makes a different form of the tree easier to work with in 
             this case."
           }
           else{
-            output$stepCheckPic <- renderUI({img(src = "cross.PNG", 
-                                                 alt = "Incorrect Answer", 
-                                                 width = 30)})
+            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
             "You have a correct structure for the tree, but the labels you have 
             chosen are not correct. There is another form of the tree that would 
             be easier to work with for this problem."
           }}}
         else{
-          output$stepCheckPic <- renderUI({img(src = "cross.PNG", 
-                                               alt = "Incorrect Answer", 
-                                               width = 30)})
+          output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
           "Check the structure of your tree."}
     }})
   
@@ -2509,11 +2487,11 @@ p <- function(context, probabilities2, probabilities3, bank){
   output$correctnessPic1 <- renderUI({
     if(isCorrect1()){
       if(reset$weight){
-      img(src = "check.PNG", alt = "Correct Answer", width = 30) }
+        renderIcon(icon = "correct", html = TRUE) }
       else{NULL}
     }
     else{
-      if(reset$weight){img(src = "cross.PNG", alt = "Incorrect Answer", width = 30)
+      if(reset$weight){renderIcon(icon = "incorrect", html = TRUE, width = 30)
     }
     }
   })
@@ -2523,11 +2501,11 @@ p <- function(context, probabilities2, probabilities3, bank){
   output$correctnessPic2 <- renderUI({
     if(isCorrect2()){
       if(reset$weight){
-        img(src = "check.PNG", alt = "Correct Answer", width = 30) }
+        renderIcon(icon = "correct", html = TRUE) }
       else{NULL}
     }
     else{
-      if(reset$weight){img(src = "cross.PNG", alt = "Incorrect Answer", width = 30)
+      if(reset$weight){renderIcon(icon = "incorrect", html = TRUE, width = 30)
       }
     }
   })
@@ -2749,11 +2727,11 @@ p <- function(context, probabilities2, probabilities3, bank){
   # generates either a check or x depending on condition passed as boolean
   cPic <- function(correct){
     if(correct){
-      if(reset$question){img(src = "check.PNG", width = 30) }
+      if(reset$question){renderIcon(icon = "correct", html = TRUE)}
       else{NULL}
     }
     else{
-      if(reset$question){img(src = "cross.PNG", width = 30)}
+      if(reset$question){renderIcon(icon = "incorrect", html = TRUE, width = 30)}
       else{NULL}
     }
   }
