@@ -24,21 +24,19 @@ APP_DESCP <<- paste(
 nodeNames <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M")
 
 # Set up question banks for challenge levels
-bank1 <- read.csv("Context_Bank_L1.csv", header = TRUE, stringsAsFactors=FALSE) # Read in question bank 1
-bank2 <- read.csv("Context_Bank_L2.csv", header = TRUE, stringsAsFactors=FALSE) # Read in question bank 2
-bank3 <- read.csv("Context_Bank_L3.csv", header = TRUE, stringsAsFactors=FALSE) # Read in question bank 3
+bank1 <- read.csv(file = "Context_Bank_L1.csv", 
+                  header = TRUE, 
+                  stringsAsFactors=FALSE) # Read in question bank 1
+bank2 <- read.csv(file = "Context_Bank_L2.csv", 
+                  header = TRUE, 
+                  stringsAsFactors=FALSE) # Read in question bank 2
+bank3 <- read.csv(file = "Context_Bank_L3.csv", 
+                  header = TRUE, 
+                  stringsAsFactors=FALSE) # Read in question bank 3
 
 # Define UI for App
 ui <- list(
    useShinyjs(), 
-#   tags$head(
-#     tags$link(rel = "stylesheet", type = "text/css", 
-#   href = "https://educationshinyappteam.github.io/Style_Guide/theme/boast.css"), 
-#   tags$style(HTML("
-#     .shiny-output-error-validation {
-#     color: red;
-#     }"))
-#   ), 
   
   ## Create the app page
   dashboardPage(
@@ -46,11 +44,13 @@ ui <- list(
     ### Create the app header
     dashboardHeader(
       titleWidth = 250, 
-      title = "Tree Diagrams", # You may use a shortened form of the title here
-      tags$li(class = "dropdown", actionLink("info", icon("info"))), 
+      title = "Tree Diagrams", 
+      tags$li(class = "dropdown", 
+              actionLink("info", icon("info"))), 
       tags$li(
         class = "dropdown",
-        tags$a(target = "_blank", icon("comments"),
+        tags$a(target = "_blank", 
+               icon("comments"),
                href = "https://pennstate.qualtrics.com/jfe/form/SV_7TLIkFtJEJ7fEPz?appName=Tree_Diagrams"
         )
       ),
@@ -63,11 +63,21 @@ ui <- list(
       width = 250, 
       sidebarMenu(
         id = "pages", 
-        menuItem("Overview", tabName = "Overview", icon = icon("tachometer-alt")), 
-        menuItem("Prerequisites", tabName = "Prerequisites", icon = icon("book")), 
-        menuItem("Explore", tabName = "Explore", icon = icon("wpexplorer")), 
-        menuItem("Challenge", tabName = "Challenge", icon = icon("cogs")), 
-        menuItem("References", tabName = "References", icon = icon("leanpub"))
+        menuItem("Overview", 
+                 tabName = "Overview", 
+                 icon = icon("tachometer-alt")), 
+        menuItem("Prerequisites", 
+                 tabName = "Prerequisites", 
+                 icon = icon("book")), 
+        menuItem("Explore", 
+                 tabName = "Explore", 
+                 icon = icon("wpexplorer")), 
+        menuItem("Challenge", 
+                 tabName = "Challenge", 
+                 icon = icon("cogs")), 
+        menuItem("References", 
+                 tabName = "References", 
+                 icon = icon("leanpub"))
       ), 
       tags$div(
         class = "sidebar-logo", 
@@ -95,7 +105,7 @@ ui <- list(
                     order to solve problems in the Challenge tab."), 
           ), 
           
-          ##### Go Button--location will depend on your goals
+          ##### Go Button
           div(
             style = "text-align: center;", 
             bsButton(
@@ -115,7 +125,8 @@ ui <- list(
             br(), 
             br(), 
             br(), 
-            div(class = "updated", "Last Update: 11/13/2020 by LMH.")
+            div(class = "updated", 
+                "Last Update: 11/13/2020 by LMH.")
           )
         ), 
         #### Set up the Prerequisites Page ----
@@ -127,11 +138,13 @@ ui <- list(
             following:"), 
           tags$ul(
             tags$li("The basic rules of probability, which are reviewed in ", 
-                    tags$a(href = "https://online.stat.psu.edu/stat100/lesson/7/7.1", 
-                           "these notes", class = "bodylinks")), 
+                    tags$a(href = "https://online.stat.psu.edu/stat100/lesson/7/7.1",
+                           "these notes", 
+                           class = "bodylinks")), 
             tags$li("The basic rules of conditional probability, which are reviewed in ", 
                     tags$a(href = "https://online.stat.psu.edu/stat200/lesson/2/2.1/2.1.3/2.1.3.2/2.1.3.2.5", 
-                           "these notes", class = "bodylinks")),
+                           "these notes", 
+                           class = "bodylinks")),
             tags$li("The Law of Total Probability: the probability that an event 
             occurs is equivalent to the sum of the probabilities of the event 
             occurring along with each possibility in a partition of the sample 
@@ -142,7 +155,7 @@ ui <- list(
             
           ),
           br(),
-          ##### Go Button--location will depend on your goals
+          ##### Go Button
           div(
             style = "text-align: center", 
             bsButton(
@@ -184,13 +197,12 @@ ui <- list(
                            value = NA, min = 0, max = 1, step = .01)),
               column(width = 2, br(), uiOutput("exploreCorrectnessPic"))
               ),
-              # fluidRow(
-              #   column(width = 6, bsButton("checkExplore", "Check Answer", size = "large")), 
-              #   # Click to go to rest of problem
-              #   column(width = 6, bsButton("next", "Next Step", size = "large")) 
-              # ), 
-              bsButton("checkExplore", "Check Answer", size = "large"),
-              bsButton("nextStep", "Next Step", size = "large"),
+              bsButton(inputId = "checkExplore", 
+                       label = "Check Answer", 
+                       size = "large"),
+              bsButton(inputId = "nextStep", 
+                       label = "Next Step", 
+                       size = "large"),
               
               # Prevalence slider
               conditionalPanel(condition = "input.nextStep", 
@@ -211,22 +223,9 @@ ui <- list(
             mainPanel(
               # Show Tree
               plotOutput("exploreGraph"), 
-              # tags$script(HTML(
-              #   "$(document).ready(function() {
-              #       document.getElementById('exploreGraph').setAttribute('aria-label',
-              #       `This plot shows the tree diagram for the scenario. The root
-              #       is node A, which has two branches, infected and not infected,
-              #       which lead to nodes B and C respectively. Each of these has a
-              #       branch for a positive and negative test with the resulting leaf
-              #       nodes as E and F for B and H and I for C.`)
-              #     })"
-              # )),
                htmlOutput("exploreAlt"),
               # Outputted text for part 2
               conditionalPanel(condition = "input.nextStep", 
-                               # textOutput("posTest"), # Probability of positive test
-                               # textOutput("falseP"), # False Positive given positive
-                               # textOutput("falseN"), # False negative given negative
                                plotOutput("exploreProbPlot"),
                                htmlOutput("exploreBarAlt"))
             )
@@ -286,9 +285,10 @@ ui <- list(
                      p("You can try various different contexts, each of which 
                        has a set of questions."), 
                      h3("Context"), 
-                     #uiOutput('contNum1'), 
                      textOutput("context1"), 
-                     bsButton("newContext1", "Next Context", size = "large"), 
+                     bsButton(inputId = "newContext1", 
+                              label = "Next Context", 
+                              size = "large"), 
                      conditionalPanel(
                        condition = "output.contextNumber1", 
                        p("Note: This is the final context currently implemented. 
@@ -303,7 +303,9 @@ ui <- list(
                          uiOutput("uMat31"), 
                          
                          # Check entries for edge weights
-                         bsButton("checkMat1", "Check Your Probabilities", size = "large"), 
+                         bsButton(inputId = "checkMat1", 
+                                  label = "Check Your Probabilities", 
+                                  size = "large"), 
                          fluidRow(
                            column(width = 2, uiOutput("correctnessPic1")), 
                            column(width = 10, textOutput("correctnessText1"))
@@ -328,7 +330,9 @@ ui <- list(
                 })"
                          )),
                          htmlOutput("graph1Alt"),
-                         bsButton("newQuestion1", "Next Question", size = "large"),
+                         bsButton(inputId = "newQuestion1", 
+                                  label = "Next Question", 
+                                  size = "large"),
                          textOutput("question1"),
                          conditionalPanel(
                        condition = "output.questionNumber1",
@@ -345,17 +349,19 @@ ui <- list(
                                                         max = 1, 
                                                         step = .01, 
                                                         width = "150px")),
-                         column(width = 2,  br(), uiOutput("correctnessPicCombo1"))),
+                         column(width = 2,  
+                                br(), 
+                                uiOutput("correctnessPicCombo1"))),
                        fluidRow(
                          div(id = "question1", 
-                             column(width = 4, bsButton("comboCheck1", 
-                                                          "Check Answer", 
-                                                      size = "large") 
+                             column(width = 4, bsButton(inputId = "comboCheck1",
+                                                        label = "Check Answer", 
+                                                        size = "large") 
                                     ), 
                              conditionalPanel(condition = "output.showAnsButton1", 
                                               column(width = 8, 
-                                              bsButton("showAns1", 
-                                                           "Show Answer", 
+                                              bsButton(inputId = "showAns1", 
+                                                       label = "Show Answer", 
                                                        size = "large"), 
                                               textOutput("answer1"))
                                               ))), 
@@ -380,7 +386,8 @@ ui <- list(
                    h3("Context"), 
                    #uiOutput('contNum2'), 
                    textOutput("context2"), 
-                   bsButton("newContext2", "Next Context", 
+                   bsButton(inputId = "newContext2", 
+                            label = "Next Context", 
                             size = "large"),  
                    conditionalPanel(
                      condition = "output.contextNumber2", 
@@ -403,7 +410,7 @@ ui <- list(
                        p("Node A"), 
                        fluidRow(
                          column(uiOutput("lab12"), width = 8), 
-                         column(selectInput("nchildA2", 
+                         column(selectInput(inputId = "nchildA2", 
                                             label = "Children", 
                                             choices = c(2, 3), 
                                             width = '60px'), 
@@ -411,16 +418,18 @@ ui <- list(
                        ), 
                        p("Node B"), 
                        fluidRow(
-                         column(uiOutput("lab22"), width = 8), 
-                         column(selectInput("nchildB2", 
+                         column(uiOutput("lab22"), 
+                                width = 8), 
+                         column(selectInput(inputId = "nchildB2", 
                                             label = "Children", 
                                             choices = c(2, 3), 
                                             width = '60px'), 
                                 width = 4)), 
                        p("Node C"), 
                        fluidRow(
-                         column(uiOutput("lab32"), width = 8), 
-                         column(selectInput("nchildC2", 
+                         column(uiOutput("lab32"), 
+                                width = 8), 
+                         column(selectInput(inputId = "nchildC2", 
                                             label = "Children", 
                                             choices = c(2, 3), 
                                             width = '60px'), 
@@ -431,24 +440,29 @@ ui <- list(
                          condition = "input.nchildA2 == 3", 
                          p("Node D"), 
                          fluidRow(
-                           column(uiOutput("lab42"), width = 8), 
-                           column(selectInput("nchildD2", 
+                           column(uiOutput("lab42"), 
+                                  width = 8), 
+                           column(selectInput(inputId = "nchildD2", 
                                               label = "Children", 
                                               choices = c(2, 3), 
                                               width = '60px'), 
                                   width = 4))
                        ), 
-                       bsButton("checkStep2", "Check Answer", 
+                       bsButton(inputId = "checkStep2", 
+                                label = "Check Answer", 
                                 size = "large"), 
-                       bsButton("skip", "Next Step", 
+                       bsButton(inputId = "skip", 
+                                label = "Next Step", 
                                 size = "large"), 
                        fluidRow(
-                         column(width = 2, uiOutput("stepCheckPic")),
-                         column(width = 10, textOutput("stepCheckFeedback")),
+                         column(width = 2, 
+                                uiOutput("stepCheckPic")),
+                         column(width = 10, 
+                                textOutput("stepCheckFeedback")),
                        )), 
                        conditionalPanel(
                          condition = "output.nextStep2", 
-                       # Matricies to let the user enter edge weights
+                       # Matrices to let the user enter edge weights
                        conditionalPanel(
                          condition = "input.nchildA2 == 2 ||input.nchildB2 == 2 
                          ||input.nchildC2 == 2 ||input.nchildD2 == 2", 
@@ -463,11 +477,14 @@ ui <- list(
                        ), 
 
                        # Check entries for edge weights
-                       bsButton("checkMat2", "Check Weights", 
+                       bsButton(inputId = "checkMat2", 
+                                label = "Check Weights", 
                                 size = "large"), 
                        fluidRow(
-                         column(width = 2, uiOutput("correctnessPic2")), 
-                         column(width = 10, textOutput("correctnessText2"))
+                         column(width = 2, 
+                                uiOutput("correctnessPic2")), 
+                         column(width = 10, 
+                                textOutput("correctnessText2"))
                        )), 
                        width = 4
                      ), 
@@ -489,19 +506,14 @@ ui <- list(
                        conditionalPanel(
                          condition = "output.nextStep2", 
                        # Options for displaying probabilities and edge labels
-                           checkboxInput("displayProbs2", 
-                                              "Display Leaf Node Probabilities"), 
+                           checkboxInput(inputId = "displayProbs2",
+                                         label = "Display Leaf Node Probabilities"), 
 
                        # Plot tree
                        plotOutput("graph2"), 
-                #        tags$script(HTML(
-                #          "$(document).ready(function() {
-                #   document.getElementById('graph2').setAttribute('aria-label',
-                #   `This plot shows the tree diagram that you created.`)
-                # })"
-                #        )),
                        htmlOutput("graph2Alt"),       
-                       bsButton("newQuestion2", "Next Question", 
+                       bsButton(inputId = "newQuestion2", 
+                                label = "Next Question", 
                                 size = "large"), 
                        textOutput("question2"), 
                         
@@ -514,25 +526,29 @@ ui <- list(
                        #br(), 
                        # Answer questions about scenario
                        fluidRow(
-                         column(width = 3, numericInput("comboProb2", 
-                                                        "Enter Answer", 
-                                                        value = NA, 
-                                                        min = 0, 
-                                                        max = 1, 
-                                                        step = .01, 
-                                                        width = "150px")),
-                         column(width = 2, br(), uiOutput("correctnessPicCombo2"))
+                         column(width = 3, 
+                                numericInput(inputId = "comboProb2", 
+                                             label = "Enter Answer", 
+                                             value = NA, 
+                                             min = 0, 
+                                             max = 1, 
+                                             step = .01, 
+                                             width = "150px")),
+                         column(width = 2, 
+                                br(), 
+                                uiOutput("correctnessPicCombo2"))
                        ),
                        fluidRow(
                          div(id = "question2", 
                              column(width = 4, 
-                                    bsButton("comboCheck2", 
-                                                 "Check Answer", 
+                                    bsButton(inputId = "comboCheck2", 
+                                             label = "Check Answer", 
                                              size = "large")
                              ), 
                              conditionalPanel(condition = "output.showAnsButton2", 
                              column(width = 8, 
-                                    bsButton("showAns2", "Show Answer", 
+                                    bsButton(inputId = "showAns2", 
+                                             label = "Show Answer", 
                                              size = "large"), 
                                     textOutput("answer2"))
                              )))), 
@@ -546,25 +562,29 @@ ui <- list(
                  h3("Context"), 
                  #uiOutput('contNum3'), 
                  textOutput("context3"), 
-                 bsButton("newContext3", "Next Context", 
+                 bsButton(inputId = "newContext3", 
+                          label = "Next Context", 
                           size = "large"), 
                  conditionalPanel(
                    condition = "output.contextNumber3", 
                    p("Note: This is the final context currently implemented. 
                    Clicking New Context will return you to the first context.")
                  ), 
-                 br(), br(),
+                 br(), 
+                 br(),
         sidebarLayout(
           sidebarPanel(
-            checkboxInput("shownChildOptions", 
-                          "Show options for number of children", 
+            checkboxInput(inputId = "shownChildOptions", 
+                          label = "Show options for number of children", 
                           value = TRUE), 
             # Inputs for all number of children
             conditionalPanel(
               condition = "input.shownChildOptions", 
             fluidRow(
-              column(paste("Options for node ", nodeNames[1]), width = 8), 
-              column(selectInput("nchildA3", 
+              column(paste("Options for node ", 
+                           nodeNames[1]), 
+                     width = 8), 
+              column(selectInput(inputId = "nchildA3", 
                                  label = NULL, 
                                  choices = c(2, 3), 
                                  selected = 2, 
@@ -572,16 +592,21 @@ ui <- list(
                      width = 4)
             ), 
             fluidRow(
-              column(paste("Options for node ", nodeNames[2]), width = 8), 
-              column(selectInput("nchildB3", 
+              column(paste("Options for node ", 
+                           nodeNames[2]), 
+                     width = 8), 
+              column(selectInput(inputId = "nchildB3", 
                                  label = NULL, 
                                  choices = c(0, 2, 3), 
-                                 selected = 2, width = '60px'), 
+                                 selected = 2,
+                                 width = '60px'), 
                      width = 4)
             ), 
             fluidRow(
-              column(paste("Options for node ", nodeNames[3]), width = 8), 
-              column(selectInput("nchildC3", 
+              column(paste("Options for node ", 
+                           nodeNames[3]), 
+                     width = 8), 
+              column(selectInput(inputId = "nchildC3", 
                                  label = NULL, 
                                  choices = c(0, 2, 3), 
                                  selected = 2, 
@@ -592,20 +617,22 @@ ui <- list(
             conditionalPanel(
               condition = "input.nchildA3 == 3", 
               fluidRow(
-                column(paste("Options for node ", nodeNames[4]), width = 8), 
-                column(selectInput("nchildD3", 
+                column(paste("Options for node ", 
+                             nodeNames[4]), 
+                       width = 8), 
+                column(selectInput(inputId = "nchildD3", 
                                    label = NULL, 
                                    choices = c(0, 2, 3), 
                                    selected = 2, 
                                    width = '60px'), 
                        width = 4)))), 
             
-            checkboxInput("showLabelOptions", 
-                          "Show options for labels", 
+            checkboxInput(inputId = "showLabelOptions", 
+                          label = "Show options for labels", 
                           value = TRUE), 
             conditionalPanel(
               condition = "input.showLabelOptions", 
-            # Matricies to let the user enter edge labels
+            # Matrices to let the user enter edge labels
             conditionalPanel(
               condition = "input.nchildA3 == 2 ||input.nchildB3 == 2 ||
               input.nchildC3 == 2 ||input.nchildD3 == 2", 
@@ -622,12 +649,12 @@ ui <- list(
                               p("Caution: Lengthy labels may overlap on the 
                                 graph. Consider using shorter labels.", 
                                 class = "redtext")), 
-            checkboxInput("showWeightOptions", 
-                          "Show options for edge probabilities", 
+            checkboxInput(inputId = "showWeightOptions", 
+                          label = "Show options for edge probabilities", 
                           value = TRUE), 
             conditionalPanel(
               condition = "input.showWeightOptions", 
-            # Matricies to let the user enter edge weights
+            # Matrices to let the user enter edge weights
             conditionalPanel(
               condition = "input.nchildA3 == 2 ||input.nchildB3 == 2 ||
               input.nchildC3 == 2 ||input.nchildD3 == 2", 
@@ -641,8 +668,8 @@ ui <- list(
             uiOutput("uMat33")
              )), 
             conditionalPanel(condition = "output.showRecursive",
-            checkboxInput("recursionOptions", 
-                          "Show options for recursive nodes", 
+            checkboxInput(inputId = "recursionOptions", 
+                          label = "Show options for recursive nodes", 
                           value = FALSE), 
             conditionalPanel(condition = "input.recursionOptions", 
                              uiOutput("recursiveButtons")
@@ -665,7 +692,8 @@ ui <- list(
                   the inputs with node A as the root node.`)
                 })"
             )),
-            bsButton("newQuestion3", "Next Question", 
+            bsButton(inputId = "newQuestion3", 
+                     label = "Next Question", 
                      size = "large"), 
             textOutput("question3"), 
                    conditionalPanel(
@@ -674,27 +702,38 @@ ui <- list(
                        Clicking Next Question will return you to the first 
                        question.")
                    ), 
-            #br(), 
+
             # Answer questions about scenario
             fluidRow(
-              column(width = 3, numericInput("comboProb3", "Enter Answer", 
-                                  value = NA, min = 0, max = 1, step = .01, width = "150px")),
-              column(width = 2, br(), uiOutput("correctnessPicCombo3"))
+              column(width = 3, 
+                     numericInput(inputId = "comboProb3", 
+                                  label = "Enter Answer", 
+                                  value = NA, 
+                                  min = 0, 
+                                  max = 1, 
+                                  step = .01, 
+                                  width = "150px")),
+              column(width = 2, 
+                     br(), 
+                     uiOutput("correctnessPicCombo3"))
             ),
             fluidRow(
               div(id = "question3", 
                   column(width = 3, 
-                         bsButton("comboCheck3", "Check Answer", 
+                         bsButton(inputId = "comboCheck3", 
+                                  label = "Check Answer", 
                                   size = "large"), 
                          ), 
                   conditionalPanel(
                     condition = "output.showHintButton3", 
                   column(width = 2, 
-                           bsButton("showHint3", "Hint", 
+                           bsButton(inputId = "showHint3", 
+                                    label = "Hint", 
                                     size = "large")
                          ), 
                   column(width = 7, 
-                         bsButton("showAns3", "Show Answer", 
+                         bsButton(inputId = "showAns3", 
+                                  label = "Show Answer", 
                                   size = "large"), 
                          textOutput("answer3")), 
                   br(), 
@@ -785,12 +824,21 @@ ui <- list(
 # Define server logic ----
 server <- function(input, output, session) {
   # Tracks context number, question number, and when to reset the show answer options 
-  index <- reactiveValues(context1 = 1, question1 = 1, 
-                          context2 = 1, question2 = 1, 
-                          context3 = 1, question3 = 1)
-  reset <- reactiveValues(weight = FALSE, question = FALSE, answer = FALSE, 
-                          setUp2 = FALSE, setUpAns2 = FALSE, hint3 = FALSE, 
-                          ans1 = FALSE, ans2 = FALSE, ans3 = FALSE)
+  index <- reactiveValues(context1 = 1, 
+                          question1 = 1, 
+                          context2 = 1, 
+                          question2 = 1, 
+                          context3 = 1, 
+                          question3 = 1)
+  reset <- reactiveValues(weight = FALSE, 
+                          question = FALSE, 
+                          answer = FALSE, 
+                          setUp2 = FALSE, 
+                          setUpAns2 = FALSE, 
+                          hint3 = FALSE, 
+                          ans1 = FALSE, 
+                          ans2 = FALSE, 
+                          ans3 = FALSE)
   
   # Info button
   observeEvent(input$info, {
@@ -809,7 +857,7 @@ server <- function(input, output, session) {
   observeEvent(
     eventExpr = input$go1, 
     handlerExpr = { 
-      updateTabItems(session, 
+      updateTabItems(session = session, 
                      inputId = "pages", 
                      selected = "Explore" 
       ) 
@@ -819,7 +867,7 @@ server <- function(input, output, session) {
   observeEvent(
     eventExpr = input$go2, 
     handlerExpr = { 
-      updateTabItems(session, 
+      updateTabItems(session = session, 
                      inputId = "pages", 
                      selected = "Explore" 
       ) 
@@ -829,7 +877,7 @@ server <- function(input, output, session) {
   observeEvent(
     eventExpr = input$exToCh, 
     handlerExpr = { 
-      updateTabItems(session, 
+      updateTabItems(session = session, 
                      inputId = "pages", 
                      selected = "Challenge" 
       ) 
@@ -838,7 +886,10 @@ server <- function(input, output, session) {
   # EXPLORE TAB ----
   
   # Only let Next button be hit once
-  observeEvent(input$nextStep, {updateButton(session, "nextStep", disabled = TRUE)})
+  observeEvent(input$nextStep, {
+    updateButton(session = session, 
+                 inputId = "nextStep", 
+                 disabled = TRUE)})
 
   # Output text for probability of a positive test
   output$posTest <- renderText({
@@ -849,31 +900,44 @@ server <- function(input, output, session) {
   # Output text for probability of a false negative
   output$falseN <- renderText({
     edgeLabels <- c(input$prevalence, 1-input$prevalence, .98, .02, .03, .97)
-    pNeg <- round(edgeLabels[1]*edgeLabels[4]+edgeLabels[2]*edgeLabels[6], 4)
+    pNeg <- round(x = edgeLabels[1]*edgeLabels[4]+edgeLabels[2]*edgeLabels[6], 
+                  digits = 4)
     paste("Probability that a negative test is a false negative: ", 
-          format(round((edgeLabels[1]*edgeLabels[4])/pNeg, 4), scientific = F))})
+          format(x = round(x = (edgeLabels[1]*edgeLabels[4])/pNeg, 
+                           digits = 4), 
+                 scientific = F))})
   
   # Output text for probability of a false positive
   output$falseP <- renderText({
     edgeLabels <- c(input$prevalence, 1-input$prevalence, .98, .02, .03, .97)
-    pPos <- round(edgeLabels[1]*edgeLabels[3]+edgeLabels[2]*edgeLabels[5], 4)
+    pPos <- round(x = edgeLabels[1]*edgeLabels[3]+edgeLabels[2]*edgeLabels[5], 
+                  digits = 4)
     paste("Probability that a positive test is a false positive: ", 
-          format(round(1-((edgeLabels[1]*edgeLabels[3])/pPos), 4), scientific = F))})
+          format(x = round(x = 1-((edgeLabels[1]*edgeLabels[3])/pPos), 
+                           digits = 4), 
+                 scientific = F))})
   
   # Plot for eplore tab percentages
   output$exploreProbPlot <- renderPlot({
     edgeLabels <- c(input$prevalence, 1-input$prevalence, .98, .02, .03, .97)
-    pNeg <- round(edgeLabels[1]*edgeLabels[4]+edgeLabels[2]*edgeLabels[6], 4)
-    pPos <- round(edgeLabels[1]*edgeLabels[3]+edgeLabels[2]*edgeLabels[5], 4)
+    pNeg <- round(x = edgeLabels[1]*edgeLabels[4]+edgeLabels[2]*edgeLabels[6], 
+                  digits = 4)
+    pPos <- round(x = edgeLabels[1]*edgeLabels[3]+edgeLabels[2]*edgeLabels[5], 
+                  digits = 4)
     data <- data.frame("Name" = c("Probability of \n getting a \n positive test: ",
                                   "Probability that a \n negative test is a \n false negative",
                                   "Probability that a \n positive test is a \n false positive: "),
                        "Value" = c(edgeLabels[1]*edgeLabels[3]+edgeLabels[2]*edgeLabels[5],
-                                   round((edgeLabels[1]*edgeLabels[4])/pNeg, 4),
-                                   round(1-((edgeLabels[1]*edgeLabels[3])/pPos), 4)))
+                                   round(x = (edgeLabels[1]*edgeLabels[4])/pNeg, 
+                                         digits = 4),
+                                   round(x = 1-((edgeLabels[1]*edgeLabels[3])/pPos), 
+                                         digits = 4)))
     ggplot(aes(x = Name, y = Value), data = data) +
       geom_bar(stat = "identity")+
-      geom_text(aes(y = Value + .06, label = Value), position = position_dodge(width = .9), vjust = -.25, size = 5) +
+      geom_text(aes(y = Value + .06, label = Value), 
+                position = position_dodge(width = .9), 
+                vjust = -.25, 
+                size = 5) +
       ylim(0, 1.06) +
       coord_flip() +
       xlab("") +
@@ -899,12 +963,17 @@ server <- function(input, output, session) {
     # Adjusts the vertex labels for the leaf nodes if weights are being shown 
       probs <- c(edgeLabels[1]*edgeLabels[3], edgeLabels[1]*edgeLabels[4], 
                  edgeLabels[2]*edgeLabels[5], edgeLabels[2]*edgeLabels[6])
-      probs <- format(round(probs, 4), scientific = F)
-      edgeLabels <- format(round(edgeLabels, 2), scientific = F)
+      probs <- format(x = round(x = probs, 
+                                digits = 4), 
+                      scientific = F)
+      edgeLabels <- format(x = round(x = edgeLabels,
+                                     digits = 2), 
+                           scientific = F)
       
     # Paste probabilities at bottom of tree
       for(i in 3:6){
-          to[i] <- paste("\n", to[i], "\n", probs[i-2])    }
+          to[i] <- paste("\n", to[i], "\n", probs[i-2])    
+          }
     
     # Make actual data frame
     data.frame(from = from, to = to, weight = edgeLabels)
@@ -920,18 +989,22 @@ server <- function(input, output, session) {
     # necessary to give labels more room)  
     for(edge in 1:6){
         if(edge%%2 == 1){
-          df$weight[edge] <- paste("\n", labels[edge], 
-                                   "      \n", df$weight[edge], 
+          df$weight[edge] <- paste("\n", 
+                                   labels[edge], 
+                                   "      \n", 
+                                   df$weight[edge], 
                                    "      ") # Move right labels further right
         }
         else{df$weight[edge] <- paste("\n      ", 
-                                      labels[edge], "\n      ", 
+                                      labels[edge], 
+                                      "\n      ", 
                                       df$weight[edge])} # Move left labels further left
     }
     
     # Make actual plot (the plot command is overridden by igraph)
     plot(igraph::graph_from_data_frame(df, directed = F), 
-         label = TRUE, edge.label = df$weight, 
+         label = TRUE, 
+         edge.label = df$weight, 
          edge.color = "#000000", 
          edge.width = 1.5, 
          vertex.label.color = "#000000", 
@@ -940,15 +1013,13 @@ server <- function(input, output, session) {
          edge.label.cex = 1.2,
          vertex.color = rep("#E69F0080", 6), # Assigns the correct color to all 6 nodes
          layout = igraph::layout_as_tree(igraph::graph_from_data_frame(df), 
-                                       root = 1))})
+                                         root = 1))})
   
   # Add either check or X when user checks their answer (ecp = Explore Correctness Pic)
   ecp <- eventReactive(input$checkExplore, {
     if(!is.na(input$exploreAns) && input$exploreAns == .0585){
-      #img(src = "check.PNG", width = 30) 
       renderIcon(icon = "correct", html = TRUE)}
     else{
-      #img(src = "cross.PNG", width = 30)
       renderIcon(icon = "incorrect", html = TRUE)
     }
   })
@@ -999,26 +1070,29 @@ server <- function(input, output, session) {
   
   # Level 2 left panel setup ----
   # Select input for labels for level 2:
-  output$lab12 <- renderUI({selectInput("label12", label = "Label", 
-                                      choices = c(bank2$label1[index$context2], 
-                                                  bank2$label2[index$context2], 
-                                                  bank2$label3[index$context2], 
-                                                  bank2$label4[index$context2]))})
-  output$lab22 <- renderUI({selectInput("label22", label = "Label", 
-                                      choices = c(bank2$label1[index$context2], 
-                                                  bank2$label2[index$context2], 
-                                                  bank2$label3[index$context2], 
-                                                  bank2$label4[index$context2]))})
+  output$lab12 <- renderUI({selectInput(inputId = "label12", 
+                                        label = "Label", 
+                                        choices = c(bank2$label1[index$context2], 
+                                                    bank2$label2[index$context2], 
+                                                    bank2$label3[index$context2], 
+                                                    bank2$label4[index$context2]))})
+  output$lab22 <- renderUI({selectInput(inputId = "label22", 
+                                        label = "Label", 
+                                        choices = c(bank2$label1[index$context2], 
+                                                    bank2$label2[index$context2], 
+                                                    bank2$label3[index$context2], 
+                                                    bank2$label4[index$context2]))})
   output$lab32 <- renderUI({selectInput("label32", label = "Label", 
                                       choices = c(bank2$label1[index$context2], 
                                                   bank2$label2[index$context2], 
                                                   bank2$label3[index$context2], 
                                                   bank2$label4[index$context2]))})
-  output$lab42 <- renderUI({selectInput("label42", label = "Label", 
-                                      choices = c(bank2$label1[index$context2], 
-                                                  bank2$label2[index$context2], 
-                                                  bank2$label3[index$context2], 
-                                                  bank2$label4[index$context2]))})
+  output$lab42 <- renderUI({selectInput(inputId = "label42", 
+                                        label = "Label", 
+                                        choices = c(bank2$label1[index$context2], 
+                                                    bank2$label2[index$context2], 
+                                                    bank2$label3[index$context2], 
+                                                    bank2$label4[index$context2]))})
   
   # Allows the user to skip the level dealing with the labels
   observeEvent(input$skip, {
@@ -1026,14 +1100,23 @@ server <- function(input, output, session) {
     reset$setUp2 <- TRUE
     reset$setUpAns2 <- FALSE
     # Updates select inputs to correct label answers
-    updateSelectInput(session, "nchildA2", selected = bank2$nCA[index$context2])
-    updateSelectInput(session, "nchildB2", selected = bank2$nCB[index$context2])
-    updateSelectInput(session, "nchildC2", selected = bank2$nCC[index$context2])
-    updateSelectInput(session, "nchildD2", selected = bank2$nCD[index$context2])
+    updateSelectInput(session = session, 
+                      label = "nchildA2", 
+                      selected = bank2$nCA[index$context2])
+    updateSelectInput(session = session, 
+                      label = "nchildB2", 
+                      selected = bank2$nCB[index$context2])
+    updateSelectInput(session = session, 
+                      label = "nchildC2", 
+                      selected = bank2$nCC[index$context2])
+    updateSelectInput(session = session, 
+                      label = "nchildD2", 
+                      selected = bank2$nCD[index$context2])
   })
   
   # Display the answer answer for label choices
-  observeEvent(input$checkStep2, {reset$setUpAns2 <- TRUE})
+  observeEvent(input$checkStep2, {
+    reset$setUpAns2 <- TRUE})
   
   # Creates feedback for check of labels
   #if all children numbers (excluding D) match the bank
@@ -1052,7 +1135,9 @@ server <- function(input, output, session) {
             #reset$setUp2 <- TRUE
             #reset$setUpAns2 <- FALSE
             output$stepCheckPic <- renderUI({
-              renderIcon(icon = "correct", html = TRUE, width = 30)})
+              renderIcon(icon = "correct", 
+                         html = TRUE, 
+                         width = 30)})
             "Good Job! You are Correct! Click the Next Step button to proceed to the next
     part of the question."
         }
@@ -1063,20 +1148,23 @@ server <- function(input, output, session) {
              input$label22 == labels[bank2$correctLabel1[index$context2]] && 
              input$label32 == labels[bank2$correctLabel1[index$context2]] && 
              input$label42 == labels[bank2$correctLabel1[index$context2]]){
-            output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
+            output$stepCheckPic <- renderIcon(icon = "correct", 
+                                              width = 30)
             "This is a valid set up for this problem, but the structure of the 
             context makes a different form of the tree easier to work with in 
             this case."
           }
           else{
-            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
+            output$stepCheckPic <- renderIcon(icon = "incorrect", 
+                                              width = 30)
             "You have a correct structure for the tree, but the labels you have 
             chosen are not correct. There is another form of the tree that would 
             be easier to work with for this problem."
           }
         }
           else{
-            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
+            output$stepCheckPic <- renderIcon(icon = "incorrect", 
+                                              width = 30)
             "Check the labels you have chosen."
           }
       }
@@ -1085,11 +1173,10 @@ server <- function(input, output, session) {
         if(input$label12 == labels[bank2$correctLabel1[index$context2]] && 
            input$label22 == labels[bank2$correctLabel2[index$context2]] && 
            input$label32 == labels[bank2$correctLabel2[index$context2]]){ 
-          #reset$setUpAns2 <- FALSE
-          #reset$setUp2 <- TRUE
-          output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
-          "Good Job! You are Correct! Click the Next Step button to proceed to the next
-    part of the question."
+          output$stepCheckPic <- renderIcon(icon = "correct", 
+                                            width = 30)
+          "Good Job! You are Correct! Click the Next Step button to proceed to 
+          the next part of the question."
           
         }
         # Label check where levels have same number
@@ -1097,20 +1184,23 @@ server <- function(input, output, session) {
           if(input$label12 == labels[bank2$correctLabel2[index$context2]] && 
              input$label22 == labels[bank2$correctLabel1[index$context2]] && 
              input$label32 == labels[bank2$correctLabel1[index$context2]]){
-            output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
+            output$stepCheckPic <- renderIcon(icon = "correct", 
+                                              width = 30)
             "This is a valid set up for this problem, but the structure of the 
             context makes a different form of the tree easier to work with in 
             this case."
           }
           else{
-            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
+            output$stepCheckPic <- renderIcon(icon = "incorrect", 
+                                              width = 30)
             "You have a correct structure for the tree, but the labels you have 
             chosen are not correct. There is another form of the tree that would 
             be easier to work with for this problem."
           }
         }
         else{
-          output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
+          output$stepCheckPic <- renderIcon(icon = "incorrect", 
+                                            width = 30)
           "Check the labels you have chosen."
         }
       }
@@ -1131,13 +1221,15 @@ server <- function(input, output, session) {
              input$label22 == labels[bank2$correctLabel1[index$context2]] && 
              input$label32 == labels[bank2$correctLabel1[index$context2]] && 
              input$label42 == labels[bank2$correctLabel1[index$context2]]){
-            output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
+            output$stepCheckPic <- renderIcon(icon = "correct", 
+                                              width = 30)
             "This is a valid set up for this problem, but the structure of the 
             context makes a different form of the tree easier to work with in 
             this case."
           }
           else{
-            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
+            output$stepCheckPic <- renderIcon(icon = "incorrect", 
+                                              width = 30)
             "You have a correct structure for the tree, but the labels you have 
             chosen are not correct. There is another form of the tree that would 
             be easier to work with for this problem."
@@ -1148,19 +1240,22 @@ server <- function(input, output, session) {
           if(input$label12 == labels[bank2$correctLabel2[index$context2]] && 
              input$label22 == labels[bank2$correctLabel1[index$context2]] && 
              input$label32 == labels[bank2$correctLabel1[index$context2]]){
-            output$stepCheckPic <- renderIcon(icon = "correct", width = 30)
+            output$stepCheckPic <- renderIcon(icon = "correct", 
+                                              width = 30)
             "This is a valid set up for this problem, but the structure of the 
             context makes a different form of the tree easier to work with in 
             this case."
           }
           else{
-            output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
+            output$stepCheckPic <- renderIcon(icon = "incorrect", 
+                                              width = 30)
             "You have a correct structure for the tree, but the labels you have 
             chosen are not correct. There is another form of the tree that would 
             be easier to work with for this problem."
           }}}
         else{
-          output$stepCheckPic <- renderIcon(icon = "incorrect", width = 30)
+          output$stepCheckPic <- renderIcon(icon = "incorrect", 
+                                            width = 30)
           "Check the structure of your tree."}
     }})
   
@@ -1223,18 +1318,18 @@ server <- function(input, output, session) {
     }
   })
   #Select inputs for context number for all 3 levels
-  output$contNum1 <- renderUI({selectInput("contextNum1",
-                                           "Context number",
+  output$contNum1 <- renderUI({selectInput(inputId = "contextNum1",
+                                           label = "Context number",
                                            choices = contNums1(),
                                            selectize = FALSE,
                                            width = "150px")})
-  output$contNum2 <- renderUI({selectInput("contextNum2",
-                                           "Context number",
+  output$contNum2 <- renderUI({selectInput(inputId = "contextNum2",
+                                           label = "Context number",
                                            choices = contNums2(),
                                            selectize = FALSE,
                                            width = "150px")})
-  output$contNum3 <- renderUI({selectInput("contextNum3",
-                                           "Context number",
+  output$contNum3 <- renderUI({selectInput(inputId = "contextNum3",
+                                           label = "Context number",
                                            choices = contNums3(),
                                            selectize = FALSE,
                                            width = "150px")})
@@ -1306,19 +1401,22 @@ server <- function(input, output, session) {
   #Matrix structure for the initial input of matrix of nodes with 2 children
   baseMat21 <- reactive({
     # Figure out which nodes need to be included as labels in the size 2 matrix
-    baseMatrix2(index$context1, bank1)
+    baseMatrix2(context = index$context1, 
+                bank = bank1)
   })
   
   #Matrix structure for the initial input of matrix of nodes with 2 children
   baseMat22 <- reactive({
     # Figure out which nodes need to be included as labels in the size 2 matrix
-    baseMatrix2(index$context2, bank2)
+    baseMatrix2(context = index$context2, 
+                bank = bank2)
   })
   
   #Matrix structure for the initial input of matrix of nodes with 2 children
   baseMat23 <- reactive({
     # Figure out which nodes need to be included as labels in the size 2 matrix
-    baseMatrix2(index$context3, bank3)
+    baseMatrix2(index = index$context3, 
+                bank = bank3)
   })
   
   # Function to create starting matrix for nodes with 3 children
@@ -1349,17 +1447,20 @@ server <- function(input, output, session) {
   # For level 1
   baseMat31 <- reactive({
     # Figure out which nodes should be included in matrix
-    baseMatrix3(index$context1, bank1)
+    baseMatrix3(context = index$context1, 
+                bank = bank1)
   })
   # For level 2
   baseMat32 <- reactive({
     # Figure out which nodes should be included in matrix
-    baseMatrix3(index$context2, bank2)
+    baseMatrix3(context = index$context2, 
+                bank = bank2)
   })
   # For level 3
   baseMat33 <- reactive({
     # Figure out which nodes should be included in matrix
-    baseMatrix3(index$context3, bank3)
+    baseMatrix3(context = index$context3, 
+                bank = bank3)
   })
   
   # Calculations to make tree ----
@@ -1401,11 +1502,17 @@ p <- function(context, probabilities2, probabilities3, bank){
   
   # Matrix of all probabilities for level 1
   probabilities1 <- reactive({
-    p(index$context1, input$probabilities21, input$probabilities31, bank1)
+    p(context = index$context1, 
+      probabilities2 = input$probabilities21, 
+      probabilities3 = input$probabilities31, 
+      bank = bank1)
   })
   # Matrix of all probabilities for level 2
   probabilities2 <- reactive({
-    p(index$context2, input$probabilities22, input$probabilities32, bank2)
+    p(context = index$context2, 
+      probabilities2 = input$probabilities22, 
+      probabilities3 = input$probabilities32, 
+      bank = bank2)
   })
   
   # Special case for probabilities for level 3
@@ -1572,15 +1679,18 @@ p <- function(context, probabilities2, probabilities3, bank){
   # Gets all nodes that are currently not in the tree
   # For level 1
   irrelevantNodes1 <- reactive({
-    badNodes(index$context1, bank1)
+    badNodes(context = index$context1, 
+             bank = bank1)
   })
   # For level 2
   irrelevantNodes2 <- reactive({
-    badNodes(index$context2, bank2)
+    badNodes(context = index$context2, 
+             bank = bank2)
   })
   # For level 3
   irrelevantNodes3 <- reactive({
-    badNodes(index$context3, bank3)
+    badNodes(context = index$context3, 
+             bank = bank3)
   })
   
   # Returns all leaf nodes for the scenario (must be working off bank)
@@ -1624,15 +1734,18 @@ p <- function(context, probabilities2, probabilities3, bank){
   # Gets numbers of leaf nodes:
   # For level 1
   leafNodes1 <- reactive({
-    lNodes(index$context1, bank1)
+    lNodes(context = index$context1, 
+           bank = bank1)
   })
   # For level 2
   leafNodes2 <- reactive({
-    lNodes(index$context2, bank2)
+    lNodes(context = index$context2, 
+           bank = bank2)
   })
   # For level 3
   leafNodes3 <- reactive({
-    lNodes(index$context3, bank3)
+    lNodes(context = index$context3, 
+           bank = bank3)
   })
   
   # Convert matrix probs to list of weights
@@ -1669,15 +1782,15 @@ p <- function(context, probabilities2, probabilities3, bank){
   # Gives all weights as a single vector
   # For level 1
   weights1 <- reactive({
-    w(probabilities1())
+    w(probs = probabilities1())
   })
   # For level 2
   weights2 <- reactive({
-    w(probabilities2())
+    w(probs = probabilities2())
   })
   # For level 3
   weights3 <- reactive({
-    w(probabilities3())
+    w(probs = probabilities3())
   })
 
   # Defines the matrix of nodes with 2 children for user to define edge weights
@@ -1701,7 +1814,7 @@ p <- function(context, probabilities2, probabilities3, bank){
       NULL
     }
     else{
-      matrixInput("probabilities22", 
+      matrixInput(inputId = "probabilities22", 
                   value = baseMat22(), 
                   rows = list(names = TRUE), 
                   cols = list( names = TRUE), 
@@ -1728,7 +1841,7 @@ p <- function(context, probabilities2, probabilities3, bank){
        bank1$nCC[index$context1] == 2){
       NULL}
     else{
-    matrixInput("probabilities31", 
+    matrixInput(inputId = "probabilities31", 
                 value = baseMat31(), 
                 rows = list(names = TRUE), 
                 cols = list( names = TRUE), 
@@ -1742,7 +1855,7 @@ p <- function(context, probabilities2, probabilities3, bank){
         bank2$nCC[index$context2] == 2)){
       NULL}
     else{
-      matrixInput("probabilities32", 
+      matrixInput(inputId = "probabilities32", 
                   value = baseMat32(), 
                   rows = list(names = TRUE), 
                   cols = list( names = TRUE), 
@@ -1825,7 +1938,7 @@ p <- function(context, probabilities2, probabilities3, bank){
   # Output for user to enter probs for nodes with 3 children for level 3
   output$uMat33 <- renderUI({
     if(!is.null(bMat33(numeric = TRUE))){
-      matrixInput("probabilities33", 
+      matrixInput(inputId = "probabilities33", 
                   value = bMat33(numeric = TRUE), 
                   rows = list(names = TRUE), 
                   cols = list( names = TRUE), 
@@ -1835,7 +1948,7 @@ p <- function(context, probabilities2, probabilities3, bank){
   # Output for user to enter labels for nodes with 3 children for level 3
   output$labelMat33 <- renderUI({
     if(!is.null(bMat33(numeric = FALSE))){
-    matrixInput("uEdgeLabels33", 
+    matrixInput(inputId = "uEdgeLabels33", 
                 value = bMat33(numeric = FALSE),  
                 rows = list(names = TRUE), 
                 cols = list( names = TRUE))}
@@ -1844,7 +1957,7 @@ p <- function(context, probabilities2, probabilities3, bank){
   # Output for user to enter labels for nodes with 2 children for level 3
   output$labelMat23 <- renderUI({
     if(!is.null(bMat23(numeric = FALSE))){
-    matrixInput("uEdgeLabels23", 
+    matrixInput(inputId = "uEdgeLabels23", 
                 value = bMat23(numeric = FALSE),  
                 rows = list(names = TRUE), 
                 cols = list( names = TRUE))}
@@ -1854,28 +1967,30 @@ p <- function(context, probabilities2, probabilities3, bank){
   output$uGMat1 <- renderUI({
     matrixInput(inputId = "userGuesses1", 
                 value = matrix(rep(0, length(leafNodes1())), 
-                       nrow = length(leafNodes1()), 
-                       dimnames = list(nodeNames[sort(leafNodes1())], 
-                                       c("Probability of Reaching the State"))
-                       ), 
+                               nrow = length(leafNodes1()), 
+                               dimnames = list(nodeNames[sort(leafNodes1())], 
+                                               c("Probability of Reaching the State"))
+                ), 
                 rows = list(names = TRUE), 
-                cols = list( names = TRUE), class = "numeric")
+                cols = list( names = TRUE), 
+                class = "numeric")
   })
   
   # Defines the matrix for user to input leaf node probabilities
   output$uGMat2 <- renderUI({
-    matrixInput("userGuesses2", 
+    matrixInput(inputId = "userGuesses2", 
                 value = matrix(rep(0, length(leafNodes2())), 
                        nrow = length(leafNodes2()), 
                        dimnames = list(nodeNames[sort(leafNodes2())], 
                                        c("Probability of Reaching the State"))), 
                 rows = list(names = TRUE), 
-                cols = list( names = TRUE), class = "numeric")
+                cols = list( names = TRUE), 
+                class = "numeric")
   })
   
   # Defines the matrix for user to input leaf node probabilities
   output$uGMat3 <- renderUI({
-    matrixInput("userGuesses3", 
+    matrixInput(inputId = "userGuesses3", 
                 value = matrix(rep(0, length(leafNodes3())), 
                        nrow = length(leafNodes3()), 
                        dimnames = list(nodeNames[sort(leafNodes3())], 
@@ -1914,7 +2029,9 @@ p <- function(context, probabilities2, probabilities3, bank){
   # Checks whether the current inputted probabilities are valid. 
   # For level 1
   isValidInput1 <- reactive({
-    validInput(index$context1, probabilities1(), bank1)
+    validInput(context = index$context1, 
+               probs = probabilities1(), 
+               bank = bank1)
   })
   # For level 2
   isValidInput2 <- reactive({
@@ -1922,7 +2039,9 @@ p <- function(context, probabilities2, probabilities3, bank){
   })
   # For level 3
   isValidInput3 <- reactive({
-    validInput(index$context3, probabilities3(), bank3)
+    validInput(context = index$context3, 
+               probs = probabilities3(), 
+               bank = bank3)
   })
   
   # Creates data frame for the graph      
@@ -2014,7 +2133,8 @@ p <- function(context, probabilities2, probabilities3, bank){
     }
     
     # Adjust for irrelevant nodes if necessary (no irrelavant nodes and not the all 2s case)
-    weight <- w(probabilities3(numeric = TRUE), numeric = TRUE)
+    weight <- w(probs = probabilities3(numeric = TRUE), 
+                numeric = TRUE)
     if(length(irrelevantNumbers)>0 && ncol(probabilities3(numeric = TRUE)) == 3){
       weight <- weight[-(irrelevantNumbers)]
     }
@@ -2097,11 +2217,11 @@ p <- function(context, probabilities2, probabilities3, bank){
   }
   
   # Create layout for output graph
-  layout1 <- reactive({layout_as_tree(graph_from_data_frame(makeGraphDataFrame1()), 
+  layout1 <- reactive({layout_as_tree(graph = graph_from_data_frame(makeGraphDataFrame1()), 
                                       root = 1)})
-  layout2 <- reactive({layout_as_tree(graph_from_data_frame(makeGraphDataFrame2()), 
+  layout2 <- reactive({layout_as_tree(graph = graph_from_data_frame(makeGraphDataFrame2()), 
                                       root = 1)})
-  layout3 <- reactive({layout_as_tree(graph_from_data_frame(makeGraphDataFrame3()), 
+  layout3 <- reactive({layout_as_tree(graph = graph_from_data_frame(makeGraphDataFrame3()), 
                                       root = 1)})
   
   # Create plot from data frame with extra formatting
@@ -2205,11 +2325,17 @@ p <- function(context, probabilities2, probabilities3, bank){
   # Creates output graph
   # For level 1
   output$graph1 <- renderPlot({
-    graph(makeGraphDataFrame1(), bank1, index$context1, layout1())
+    graph(df = makeGraphDataFrame1(), 
+          bank = bank1, 
+          context = index$context1, 
+          layout = layout1())
   })
   # For level 2
   output$graph2 <- renderPlot({
-    graph(makeGraphDataFrame2(), bank2, index$context2, layout2())
+    graph(df = makeGraphDataFrame2(), 
+          bank = bank2, 
+          context = index$context2, 
+          layout = layout2())
   })
   # For level 3  
   output$graph3 <- renderPlot({
@@ -2253,7 +2379,8 @@ p <- function(context, probabilities2, probabilities3, bank){
     
     dfTemp <- dfTemp[order(dfTemp$from), ] # order by from
     # pull edge labels from bank
-    edgeLabels <- w(probabilities3(numeric = FALSE), numeric = FALSE) 
+    edgeLabels <- w(probs = probabilities3(numeric = FALSE), 
+                    numeric = FALSE) 
 
     # only subset edge labels if necessary
     if(length(edgeLabels)!= 6){edgeLabels <- edgeLabels[goodLabels]}
@@ -2265,7 +2392,8 @@ p <- function(context, probabilities2, probabilities3, bank){
         # Move left labels further left
         df$weight[edge] <- paste("\n", 
                                  edgeLabels[edge], 
-                                 "      \n", df$weight[edge], 
+                                 "      \n", 
+                                 df$weight[edge], 
                                  "      ") 
       }
       else if(goodLabels[edge]%%3 == 2){
@@ -2368,13 +2496,14 @@ p <- function(context, probabilities2, probabilities3, bank){
     
     # Make plot using igraph
     plot(graph_from_data_frame(df, directed = F), 
-         label = TRUE, edge.label = df$weight, 
+         label = TRUE, 
+         edge.label = df$weight, 
          layout = layout3(), 
          asp = .2, 
          vertex.size = 8, 
          edge.color = "#000000", 
          edge.width = 1.5, 
-           vertex.label.color = "#000000", 
+         vertex.label.color = "#000000", 
          edge.label.color = "#000000", 
          label.cex = 1.2,
          edge.label.cex = 1.2,
@@ -2428,7 +2557,8 @@ p <- function(context, probabilities2, probabilities3, bank){
          label.cex = 1.2,
          edge.label.cex = 1.2,
          vertex.color = rep("#E69F0080", numNodes), 
-         layout = layout_as_tree(graph_from_data_frame(df), root = 1), 
+         layout = layout_as_tree(graph = graph_from_data_frame(df), 
+                                 root = 1), 
          asp = .2, 
          vertex.size = 8)
   })
@@ -2469,17 +2599,23 @@ p <- function(context, probabilities2, probabilities3, bank){
   # For Level 1
   isCorrect1 <- eventReactive(input$checkMat1, {
     reset$weight <- TRUE
-    correct(index$context1, bank1, probabilities1())
+    correct(context = index$context1, 
+            bank = bank1, 
+            probs = probabilities1())
   })
   # For Level 2
   isCorrect2 <- eventReactive(input$checkMat2, {
     reset$weight <- TRUE
-    correct(index$context2, bank2, probabilities2())
+    correct(context = index$context2, 
+            bank = bank2, 
+            probs = probabilities2())
   })
   # For Level 3
   isCorrect3 <- eventReactive(input$checkMat3, {
     reset$weight <- TRUE
-    correct(index$context3, bank3, probabilities3())
+    correct(context = index$context3, 
+            bank = bank3, 
+            probs = probabilities3())
   })
   
   # Level 1; Puts checkmark or X depending on if answer was correct and if 
@@ -2487,11 +2623,14 @@ p <- function(context, probabilities2, probabilities3, bank){
   output$correctnessPic1 <- renderUI({
     if(isCorrect1()){
       if(reset$weight){
-        renderIcon(icon = "correct", html = TRUE) }
+        renderIcon(icon = "correct", 
+                   html = TRUE) }
       else{NULL}
     }
     else{
-      if(reset$weight){renderIcon(icon = "incorrect", html = TRUE, width = 30)
+      if(reset$weight){renderIcon(icon = "incorrect", 
+                                  html = TRUE, 
+                                  width = 30)
     }
     }
   })
@@ -2501,11 +2640,14 @@ p <- function(context, probabilities2, probabilities3, bank){
   output$correctnessPic2 <- renderUI({
     if(isCorrect2()){
       if(reset$weight){
-        renderIcon(icon = "correct", html = TRUE) }
+        renderIcon(icon = "correct", 
+                   html = TRUE) }
       else{NULL}
     }
     else{
-      if(reset$weight){renderIcon(icon = "incorrect", html = TRUE, width = 30)
+      if(reset$weight){renderIcon(icon = "incorrect", 
+                                  html = TRUE, 
+                                  width = 30)
       }
     }
   })
@@ -2607,15 +2749,21 @@ p <- function(context, probabilities2, probabilities3, bank){
   # Calculates the correct probabilities
   # For Level 1
   correctProbabilities1 <- reactive({
-    cProbs(weights1(), probabilities1(), leafNodes1())
+    cProbs(weights = weights1(), 
+           probabilities = probabilities1(), 
+           leafNodes =leafNodes1())
   })
   # For Level 2
   correctProbabilities2 <- reactive({
-    cProbs(weights2(), probabilities2(), leafNodes2())
+    cProbs(weights = weights2(), 
+           probabilities = probabilities2(), 
+           leafNodes = leafNodes2())
   })
   # For Level 3
   correctProbabilities3 <- reactive({
-    cProbs(weights3(), probabilities3(), choices3())
+    cProbs(weights = weights3(), 
+           probabilities = probabilities3(), 
+           leafNodes = choices3())
   })
   
   # Calculates correct probability of combination of states
@@ -2688,9 +2836,9 @@ p <- function(context, probabilities2, probabilities3, bank){
     reset$question <- TRUE
     correctness <- ifelse(any(is.na(input$comboProb1)), 
                           FALSE,
-                          round(input$comboProb1, 2) == round(bank1[index$context1,
+                          round(input$comboProb1, 2) == round(x = bank1[index$context1,
                                                                   2*index$question1+30],
-                                                            2))
+                                                              digits = 2))
                           
     if(!correctness){
       reset$ans1 <- TRUE
@@ -2702,9 +2850,9 @@ p <- function(context, probabilities2, probabilities3, bank){
     reset$question <- TRUE
     correctness <- ifelse(any(is.na(input$comboProb2)), 
                           FALSE,
-                          round(input$comboProb2, 2) == round(bank2[index$context2, 
+                          round(x = input$comboProb2, digits = 2) == round(x = bank2[index$context2, 
                                                            2*index$question2+30], 
-                                                     2))
+                                                           digits = 2))
     if(!correctness){
       reset$ans2 <- TRUE
     }
@@ -2715,9 +2863,9 @@ p <- function(context, probabilities2, probabilities3, bank){
     reset$question <- TRUE
     correctness <- ifelse(any(is.na(input$comboProb3)), 
                           FALSE,
-                          round(input$comboProb3, 2) == round(bank3[index$context3, 
+                          round(x = input$comboProb3, digits = 2) == round(x = bank3[index$context3, 
                                                            2*index$question3+30],
-                                                           2))
+                                                           digits = 2))
     if(!correctness){
       reset$hint3 <- TRUE
     }
@@ -2727,11 +2875,14 @@ p <- function(context, probabilities2, probabilities3, bank){
   # generates either a check or x depending on condition passed as boolean
   cPic <- function(correct){
     if(correct){
-      if(reset$question){renderIcon(icon = "correct", html = TRUE)}
+      if(reset$question){renderIcon(icon = "correct", 
+                                    html = TRUE)}
       else{NULL}
     }
     else{
-      if(reset$question){renderIcon(icon = "incorrect", html = TRUE, width = 30)}
+      if(reset$question){renderIcon(icon = "incorrect", 
+                                    html = TRUE, 
+                                    width = 30)}
       else{NULL}
     }
   }
@@ -2854,7 +3005,9 @@ observeEvent(input$newContext3, {
   reset$answer <- FALSE
   reset$hint3 <- FALSE
   reset$ans3 <- FALSE
-  updateNumericInput(session, "comboProb3", value = 0)
+  updateNumericInput(session = session, 
+                     inputId = "comboProb3", 
+                     value = 0)
   
   # Reset values
 
@@ -2866,10 +3019,18 @@ observeEvent(input$newContext3, {
     count <- count + 1
   }
   
-  updateSelectInput(session, "nchildA3", selected = 2)
-  updateSelectInput(session, "nchildB3", selected = 2)
-  updateSelectInput(session, "nchildC3", selected = 2)
-  updateSelectInput(session, "nchildD3", selected = 2)
+  updateSelectInput(session = session, 
+                    inputId = "nchildA3", 
+                    selected = 2)
+  updateSelectInput(session = session, 
+                    inputId = "nchildB3", 
+                    selected = 2)
+  updateSelectInput(session = session, 
+                    inputId = "nchildC3", 
+                    selected = 2)
+  updateSelectInput(session = session, 
+                    inputId = "nchildD3", 
+                    selected = 2)
   
   # Defines the matrix of nodes with 2 children for user to define edge weights
   output$uMat23 <- renderUI({
@@ -2879,7 +3040,7 @@ observeEvent(input$newContext3, {
       NULL
     }
     else{
-      matrixInput("probabilities23", 
+      matrixInput(inputId = "probabilities23", 
                   value = bMat23(numeric = TRUE), 
                   rows = list(names = TRUE), 
                   cols = list( names = TRUE), 
@@ -2890,7 +3051,7 @@ observeEvent(input$newContext3, {
   # Output for user to enter probs for nodes with 3 children for level 3
   output$uMat33 <- renderUI({
     if(!is.null(bMat33(numeric = TRUE))){
-      matrixInput("probabilities33", 
+      matrixInput(inputId = "probabilities33", 
                   value = bMat33(numeric = TRUE), 
                   rows = list(names = TRUE), 
                   cols = list( names = TRUE), 
@@ -2900,7 +3061,7 @@ observeEvent(input$newContext3, {
   # Output for user to enter labels for nodes with 3 children for level 3
   output$labelMat33 <- renderUI({
     if(!is.null(bMat33(numeric = FALSE))){
-      matrixInput("uEdgeLabels33", 
+      matrixInput(inputId = "uEdgeLabels33", 
                   value = bMat33(numeric = FALSE),  
                   rows = list(names = TRUE), 
                   cols = list( names = TRUE))}
@@ -2909,7 +3070,7 @@ observeEvent(input$newContext3, {
   # Output for user to enter labels for nodes with 2 children for level 3
   output$labelMat23 <- renderUI({
     if(!is.null(bMat23(numeric = FALSE))){
-      matrixInput("uEdgeLabels23", 
+      matrixInput(inputId = "uEdgeLabels23", 
                   value = bMat23(numeric = FALSE),  
                   rows = list(names = TRUE), 
                   cols = list( names = TRUE))}
@@ -2919,31 +3080,28 @@ observeEvent(input$newContext3, {
   
   # Defines the matrix for user to input leaf node probabilities
   output$uGMat3 <- renderUI({
-    matrixInput("userGuesses3", 
+    matrixInput(inputId = "userGuesses3", 
                 value = matrix(rep(0, length(leafNodes3())), 
-                       nrow = length(leafNodes3()), 
-                       dimnames = list(nodeNames[sort(leafNodes3())], 
-                                       c("Probability of Reaching the State"))), 
+                               nrow = length(leafNodes3()), 
+                               dimnames = list(nodeNames[sort(leafNodes3())], 
+                                               c("Probability of Reaching the State"))), 
                 rows = list(names = TRUE), 
-                cols = list( names = TRUE), class = "numeric")
+                cols = list( names = TRUE), 
+                class = "numeric")
   })
-  
-  
-  
-  #END RESET VALUES
-  
-  
 })
 
 # Button to get a new question
 # For Level 1
 observeEvent(input$newQuestion1, {
   # Shift question index
-  if(index$question1<bank1[index$context1, 30]){
+  if(index$question1 < bank1[index$context1, 30]){
     index$question1 <- index$question1+1}
   else{index$question1 <- 1}
   # Reset all question dependent feedback/shown responses
-  updateNumericInput(session, "comboProb1", value = 0)
+  updateNumericInput(session = session, 
+                     inputId = "comboProb1", 
+                     value = 0)
   reset$question <- FALSE
   reset$answer <- FALSE
   reset$ans1 <- FALSE
@@ -2958,7 +3116,9 @@ observeEvent(input$newQuestion2, {
   reset$question <- FALSE
   reset$answer <- FALSE
   reset$ans2 <- FALSE
-  updateNumericInput(session, "comboProb2", value = 0)
+  updateNumericInput(session = session, 
+                     inputId = "comboProb2", 
+                     value = 0)
 })
 # For Level 3
 observeEvent(input$newQuestion3, {
@@ -2971,7 +3131,9 @@ observeEvent(input$newQuestion3, {
   reset$answer <- FALSE
   reset$hint3 <- FALSE
   reset$ans3 <- FALSE
-  updateNumericInput(session, "comboProb3", value = 0)
+  updateNumericInput(session = session, 
+                     inputId = "comboProb3", 
+                     value = 0)
 })
 
 # Output for the context
@@ -3210,7 +3372,7 @@ output$recursiveButtons <- renderUI({
   count <- 1
   for(node in sort(choices3())){
     buttons[[count]] <- radioButtons(
-      paste0("rButtons", nodeNames[node]), 
+      inputId = paste0("rButtons", nodeNames[node]), 
       label = paste("Node", nodeNames[node], "Recurses To"), 
       choices = c("None", nonLeaves()), 
       inline = T
@@ -3263,7 +3425,8 @@ labelFromDF <- function(df){
   sentences <- "This plot shows the tree."
   # If in a /n node /n probability case, takes only letter
   df$to <- regmatches(x = df$to, 
-                      m = regexpr(pattern = "[ABCDEFGHIJKLM]", text = df$to))
+                      m = regexpr(pattern = "[ABCDEFGHIJKLM]", 
+                                  text = df$to))
   # Creates actual text
   for(row in 1:nrow(df)){
     sentences <- paste0(sentences, " Edge ", row, " goes from ", df$from[row], " to ", 
@@ -3291,8 +3454,10 @@ output$exploreAlt <- renderUI({
 output$exploreBarAlt <- renderUI({
   # Create data frame including labels
   edgeLabels <- c(input$prevalence, 1-input$prevalence, .98, .02, .03, .97)
-  pNeg <- round(edgeLabels[1]*edgeLabels[4]+edgeLabels[2]*edgeLabels[6], 4)
-  pPos <- round(edgeLabels[1]*edgeLabels[3]+edgeLabels[2]*edgeLabels[5], 4)
+  pNeg <- round(x = edgeLabels[1]*edgeLabels[4]+edgeLabels[2]*edgeLabels[6], 
+                digits = 4)
+  pPos <- round(x = edgeLabels[1]*edgeLabels[3]+edgeLabels[2]*edgeLabels[5], 
+                digits = 4)
   data <- data.frame("Name" = c("Probability of \n getting a \n positive test: ",
                                 "Probability that a \n negative test is a \n false negative",
                                 "Probability that a \n positive test is a \n false positive: "),
@@ -3337,26 +3502,66 @@ output$graph2Alt <- renderUI({
 })
 
 # Makes sure that all of the buttons that "don't exist" still run
-outputOptions(output, "questionNumber1", suspendWhenHidden = FALSE)
-outputOptions(output, "contextNumber1", suspendWhenHidden = FALSE)
-outputOptions(output, "questionNumber2", suspendWhenHidden = FALSE)
-outputOptions(output, "contextNumber2", suspendWhenHidden = FALSE)
-outputOptions(output, "questionNumber3", suspendWhenHidden = FALSE)
-outputOptions(output, "contextNumber3", suspendWhenHidden = FALSE)
-outputOptions(output, "nextStep2", suspendWhenHidden = FALSE)
-outputOptions(output, "uMat23", suspendWhenHidden = FALSE)
-outputOptions(output, "uMat33", suspendWhenHidden = FALSE)
-outputOptions(output, "labelMat23", suspendWhenHidden = FALSE)
-outputOptions(output, "labelMat33", suspendWhenHidden = FALSE)
-outputOptions(output, "showLabelWarning", suspendWhenHidden = FALSE)
-outputOptions(output, "showHintButton3", suspendWhenHidden = FALSE)
-outputOptions(output, "showAnsButton1", suspendWhenHidden = FALSE)
-outputOptions(output, "showAnsButton2", suspendWhenHidden = FALSE)
-outputOptions(output, "recursiveButtons", suspendWhenHidden = FALSE)
-outputOptions(output, "showRecursive", suspendWhenHidden = FALSE)
-outputOptions(output, "contNum1", suspendWhenHidden = FALSE)
-outputOptions(output, "contNum2", suspendWhenHidden = FALSE)
-outputOptions(output, "contNum3", suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "questionNumber1", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "contextNumber1", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "questionNumber2", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "contextNumber2", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "questionNumber3", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "contextNumber3", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "nextStep2", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "uMat23", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "uMat33", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "labelMat23", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "labelMat33", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "showLabelWarning", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "showHintButton3", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "showAnsButton1", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "showAnsButton2", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "recursiveButtons", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "showRecursive", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "contNum1", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "contNum2", 
+              suspendWhenHidden = FALSE)
+outputOptions(x = output, 
+              name = "contNum3", 
+              suspendWhenHidden = FALSE)
 
 
 }
