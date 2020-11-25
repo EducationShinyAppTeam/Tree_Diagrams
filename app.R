@@ -12,14 +12,6 @@ library(ggplot2)
 
 options(dplyr.summarise.inform = FALSE) # Prevents annoying warning message
 
-# App Meta Data----------------------------------------------------------------
-APP_TITLE <<- "Tree Diagrams"
-APP_DESCP <<- paste(
-  "This app explores the structure of tree diagrams and challenges the user to", 
-  "create their own tree diagrams to solve problems."
-)
-# End App Meta Data------------------------------------------------------------
-
 # Names for each node
 nodeNames <- LETTERS[1:13]
 
