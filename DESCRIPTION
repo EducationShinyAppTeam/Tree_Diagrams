@@ -3,7 +3,7 @@ ShortName: Tree Diagrams
 Date: 2020-11-24
 Lifecycle: experimental
 Authors@R: c(
-    person(given = "Leah", family = "Hunt", email = "lmh5964@psu.edu", role = c("aut", "cre")),
+    person(given = "Leah", family = "Hunt", email = "lmh5964@psu.edu", role = c("aut", "cre"))
   )
 Chapter: Basic Probability
 Description: c(
