@@ -6,5 +6,4 @@
 
 ![App Screenshot](/docs/screenshot.png)
 
-c("This app explores the structure of tree diagrams and challenges the user", 
-  "to create their own tree diagrams to solve problems.")
+This app explores the structure of tree diagrams and challenges the user to create their own tree diagrams to solve problems.

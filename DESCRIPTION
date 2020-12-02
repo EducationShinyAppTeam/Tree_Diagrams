@@ -5,7 +5,7 @@ Lifecycle: experimental
 Authors@R: c(
     person(given = "Leah", family = "Hunt", email = "lmh5964@psu.edu", role = c("aut", "cre"))
   )
-Chapter: Basic Probability
+Chapter: Chapter 3
 Description: c(
     "This app explores the structure of tree diagrams and challenges the user", 
     "to create their own tree diagrams to solve problems."
