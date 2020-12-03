@@ -998,7 +998,11 @@ ui <- list(
             "Wickham, W. (2016), ggplot2: Elegant graphics for data analysis,
             R Package. Springer-Verlag New York. Available from
             https://ggplot2.tidyverse.org"
-          )
+          ),
+          br(),
+          br(),
+          br(),
+          boastUtils::copyrightInfo()
         )
       )
     )
