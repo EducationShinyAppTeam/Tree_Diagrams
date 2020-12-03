@@ -5,17 +5,14 @@ Lifecycle: experimental
 Authors@R: c(
     person(given = "Leah", family = "Hunt", email = "lmh5964@psu.edu", role = c("aut", "cre"))
   )
-Chapter: Chapter 3
+Chapter: Basic Probability
 Description: c(
     "This app explores the structure of tree diagrams and challenges the user", 
     "to create their own tree diagrams to solve problems."
   )
-LearningObjectives: c(
-    "The student will learn to understand Concept A in way z.",
-    "The student will learn to understand Concept B as description y."
-  )
+LearningObjectives: c()
 DisplayMode: Normal
-URL: https://psu-eberly.shinyapps.io/Sample_App
+URL: https://psu-eberly.shinyapps.io/Tree_Diagrams
 BugReports: https://github.com/EducationShinyAppTeam/Tree_Diagrams/issues
 License: CC-BY-NC-SA-4.0
 Tags: multilevel
