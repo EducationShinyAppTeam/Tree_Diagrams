@@ -2778,7 +2778,9 @@ server <- function(input, output, session) {
       goodLabels <- c(goodLabels, 4:5)
     } else if (input$nchildB3 == 0) {
       dfTemp[nrow(dfTemp) + 1, ] = list("B", 0)
-    } else if (input$nchildC3 == 3) {
+    }
+
+    if (input$nchildC3 == 3) {
       goodLabels <- c(goodLabels, 7:9)
     } else if (input$nchildC3 == 2) {
       goodLabels <- c(goodLabels, 7:8)
