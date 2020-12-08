@@ -1312,7 +1312,7 @@ server <- function(input, output, session) {
         success = correct
       )
       
-      boastUtils::storeStatement(stmt)
+      boastUtils::storeStatement(session, stmt)
     }
   )
 
@@ -2994,7 +2994,7 @@ server <- function(input, output, session) {
   })
   # Check if entered probabilities are correct
   correct <- function(context, bank, probs) {
-    correct <- FALSE
+    success <- FALSE
     if (!any(is.na(probs))) {
       # Split case by whether A has 2 or 3 children
       if (bank[context, 26] == 2) {
@@ -3018,7 +3018,7 @@ server <- function(input, output, session) {
           isSame <- FALSE
         }
       }
-      correct <- isSame
+      success <- isSame
     }
     
     stmt <- boastUtils::generateStatement(
@@ -3028,12 +3028,12 @@ server <- function(input, output, session) {
       description = bank[context,]$Context,
       interactionType = "long-fill-in",
       response = jsonlite::toJSON(as.data.frame(probs)),
-      success = correct
+      success = success
     )
     
-    boastUtils::storeStatement(stmt)
+    boastUtils::storeStatement(session, stmt)
     
-    return(correct)
+    return(success)
   }
   # Determines whether the transition matrix is correct
   # For Level 1
@@ -3326,7 +3326,7 @@ server <- function(input, output, session) {
         success = correctness
       )
       
-      boastUtils::storeStatement(stmt)
+      boastUtils::storeStatement(session, stmt)
       
       return(correctness)
     })
@@ -3357,7 +3357,7 @@ server <- function(input, output, session) {
         success = correctness
       )
       
-      boastUtils::storeStatement(stmt)
+      boastUtils::storeStatement(session, stmt)
       
       return(correctness)
     })
@@ -3388,7 +3388,7 @@ server <- function(input, output, session) {
         success = correctness
       )
       
-      boastUtils::storeStatement(stmt)
+      boastUtils::storeStatement(session, stmt)
       
       return(correctness)
     })
