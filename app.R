@@ -30,7 +30,8 @@ bank2 <- read.csv(
 bank3 <- read.csv(
   file = "Context_Bank_L3.csv",
   header = TRUE,
-  stringsAsFactors = FALSE)
+  stringsAsFactors = FALSE
+)
 
 # Define UI for App ----
 ui <- list(
@@ -1290,14 +1291,28 @@ server <- function(input, output, session) {
   observeEvent(
     eventExpr = input$checkExplore,
     handlerExpr = {
+      correct <- !is.na(input$exploreAns) && input$exploreAns == .0585
+      
       output$exploreCorrectnessPic <- renderIcon(
         icon = ifelse(
-          test = !is.na(input$exploreAns) && input$exploreAns == .0585,
+          test = correct,
           yes = "correct",
           no = "incorrect"
         ),
         width = 60
       )
+      
+      stmt <- boastUtils::generateStatement(
+        session,
+        verb = "answered",
+        object = "exploreAns",
+        description = "What is the probability that a randomly selected American would show a positive antibody test?",
+        interactionType = "numeric",
+        response = input$exploreAns,
+        success = correct
+      )
+      
+      boastUtils::storeStatement(stmt)
     }
   )
 
@@ -2978,7 +2993,8 @@ server <- function(input, output, session) {
     )
   })
   # Check if entered probabilities are correct
-  correct <- function(context, bank, probs){
+  correct <- function(context, bank, probs) {
+    correct <- FALSE
     if (!any(is.na(probs))) {
       # Split case by whether A has 2 or 3 children
       if (bank[context, 26] == 2) {
@@ -2994,18 +3010,30 @@ server <- function(input, output, session) {
         user <- c(probs[1, ], probs[2, ], probs[3, ], probs[4, ])
         correct <- bank[context, 14:25]
       }
-      isSame = TRUE
+      isSame <- TRUE
       # Loop to check whether entered values are same as correct ones (defined above)
       for (i in 1:length(correct)) {
         # The as.numeric shouldn't be necessary but prevents type issues in bank
         if (round(as.numeric(user[i]), 2) != round(as.numeric(correct[i]), 2)) {
-          isSame = FALSE
+          isSame <- FALSE
         }
       }
-      return(isSame)
-    } else {
-      return(FALSE)
+      correct <- isSame
     }
+    
+    stmt <- boastUtils::generateStatement(
+      session,
+      verb = "answered",
+      object = paste0("userGuesses", context),
+      description = bank[context,]$Context,
+      interactionType = "long-fill-in",
+      response = jsonlite::toJSON(as.data.frame(probs)),
+      success = correct
+    )
+    
+    boastUtils::storeStatement(stmt)
+    
+    return(correct)
   }
   # Determines whether the transition matrix is correct
   # For Level 1
@@ -3013,11 +3041,13 @@ server <- function(input, output, session) {
     eventExpr = input$checkMat1,
     valueExpr = {
       reset$weight <- TRUE
-      correct(
+      isCorrect <- correct(
         context = index$context1,
         bank = bank1,
         probs = probabilities1()
       )
+      
+      return(isCorrect)
     })
   # For Level 2
   isCorrect2 <- eventReactive(
@@ -3285,8 +3315,22 @@ server <- function(input, output, session) {
       if (!correctness) {
         reset$ans1 <- TRUE
       }
+      
+      stmt <- boastUtils::generateStatement(
+        session,
+        verb = "answered",
+        object = "comboProb1",
+        description = bank1[index$context1, 2 * index$question1 + 29],
+        interactionType = "numeric",
+        response = input$comboProb1,
+        success = correctness
+      )
+      
+      boastUtils::storeStatement(stmt)
+      
       return(correctness)
     })
+  
   # For Level 2
   isCorrectCombo2 <- eventReactive(
     eventExpr = input$comboCheck2,
@@ -3302,8 +3346,22 @@ server <- function(input, output, session) {
       if (!correctness) {
         reset$ans2 <- TRUE
       }
+      
+      stmt <- boastUtils::generateStatement(
+        session,
+        verb = "answered",
+        object = "comboProb2",
+        description = bank2[index$context2, 2 * index$question2 + 29],
+        interactionType = "numeric",
+        response = input$comboProb2,
+        success = correctness
+      )
+      
+      boastUtils::storeStatement(stmt)
+      
       return(correctness)
     })
+  
   # For Level 3
   isCorrectCombo3 <- eventReactive(
     eventExpr = input$comboCheck3,
@@ -3319,6 +3377,19 @@ server <- function(input, output, session) {
       if (!correctness) {
         reset$hint3 <- TRUE
       }
+      
+      stmt <- boastUtils::generateStatement(
+        session,
+        verb = "answered",
+        object = "comboProb3",
+        description = bank3[index$context3, 2 * index$question3 + 29],
+        interactionType = "numeric",
+        response = input$comboProb3,
+        success = correctness
+      )
+      
+      boastUtils::storeStatement(stmt)
+      
       return(correctness)
     })
 
@@ -3975,7 +4046,7 @@ server <- function(input, output, session) {
   })
 
   # Creates alt text from a data frame of tree info
-  labelFromDF <- function(df){
+  labelFromDF <- function(df) {
     sentences <- "This plot shows the tree."
     # If in a /n node /n probability case, takes only letter
     df$to <- regmatches(x = df$to,
